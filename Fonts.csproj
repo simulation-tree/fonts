@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\simulation\source\Simulation.csproj" />
+    <ProjectReference Include="..\textures\Textures.csproj" />
+    <ProjectReference Include="..\unmanaged\source\Unmanaged.csproj" />
+  </ItemGroup>
+
+</Project>
