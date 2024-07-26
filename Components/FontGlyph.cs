@@ -4,9 +4,9 @@ namespace Fonts.Components
 {
     public readonly struct FontGlyph
     {
-        public readonly EntityID value;
+        public readonly eint value;
 
-        public FontGlyph(EntityID value)
+        public FontGlyph(eint value)
         {
             this.value = value;
         }

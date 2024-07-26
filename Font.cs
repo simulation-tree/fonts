@@ -3,25 +3,27 @@ using Data.Events;
 using Fonts.Components;
 using Fonts.Events;
 using Simulation;
-using Textures;
+using System;
+using Textures.Components;
 using Unmanaged;
 
 namespace Fonts
 {
-    public readonly struct Font : IDisposable
+    public readonly struct Font : IFont, IDisposable
     {
         public readonly Entity entity;
 
-        public readonly FixedString FamilyName => entity.GetComponent<FontName>().familyName;
-        public readonly float LineHeight => entity.GetComponent<FontMetrics>().lineHeight;
-        public readonly bool IsDestroyed => entity.IsDestroyed;
-        public readonly AtlasTexture Atlas => new(entity.world, entity.GetComponent<FontAtlas>().value);
-        public readonly uint GlyphCount => entity.GetCollection<FontGlyph>().Count;
-        public readonly Glyph this[uint index] => new(entity.world, entity.GetCollection<FontGlyph>()[index].value);
+        World IEntity.World => entity.world;
+        eint IEntity.Value => entity.value;
 
         public Font()
         {
             throw new InvalidOperationException("Cannot create a font without a world.");
+        }
+
+        public Font(World world, eint existingEntity)
+        {
+            entity = new(world, existingEntity);
         }
 
         public Font(World world, ReadOnlySpan<char> address)
@@ -42,7 +44,12 @@ namespace Fonts
 
         public override string ToString()
         {
-            return FamilyName.ToString();
+            return this.GetFamilyName().ToString();
+        }
+
+        public static Query GetQuery(World world)
+        {
+            return new(world, RuntimeType.Get<IsFont>());
         }
     }
 }

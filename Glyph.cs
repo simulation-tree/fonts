@@ -1,5 +1,6 @@
 ﻿using Fonts.Components;
 using Simulation;
+using System;
 using System.Numerics;
 using Unmanaged.Collections;
 
@@ -11,29 +12,37 @@ namespace Fonts
 
         private readonly UnmanagedList<Kerning> kernings;
 
-        public readonly char Character => entity.GetComponent<IsGlyph>().character;
-        public readonly Vector2 Advance => entity.GetComponent<IsGlyph>().advance;
-        public readonly Vector2 Offset => entity.GetComponent<IsGlyph>().offset;
-        public readonly Vector2 Size => entity.GetComponent<IsGlyph>().size;
+        public readonly char Character => Component.character;
+        public readonly Vector2 Advance => Component.advance;
+        public readonly Vector2 Offset => Component.offset;
+        public readonly Vector2 Size => Component.size;
 
         /// <summary>
         /// Coordinates on the font's atlas texture.
         /// </summary>
-        public readonly Vector4 Region => entity.GetComponent<IsGlyph>().region;
+        public readonly Vector4 Region => Component.region;
 
         public readonly ReadOnlySpan<Kerning> Kernings => kernings.AsSpan();
 
-        public Glyph(World world, EntityID existingEntity)
+        private readonly IsGlyph Component
+        {
+            get
+            {
+                return entity.GetComponent<Entity, IsGlyph>();
+            }
+        }
+
+        public Glyph(World world, eint existingEntity)
         {
             entity = new(world, existingEntity);
-            kernings = entity.GetCollection<Kerning>();
+            kernings = entity.GetList<Entity, Kerning>();
         }
 
         public Glyph(World world, char character, Vector2 advance, Vector2 offset, Vector2 size, Vector4 region, ReadOnlySpan<Kerning> kernings)
         {
             this.entity = new(world);
             entity.AddComponent(new IsGlyph(character, advance, offset, size, region));
-            this.kernings = entity.CreateCollection<Kerning>((uint)(kernings.Length + 1));
+            this.kernings = entity.CreateList<Entity, Kerning>((uint)(kernings.Length + 1));
             this.kernings.AddRange(kernings);
         }
 

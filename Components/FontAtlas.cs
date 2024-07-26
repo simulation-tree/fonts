@@ -4,9 +4,9 @@ namespace Fonts.Components
 {
     public readonly struct FontAtlas
     {
-        public readonly EntityID value;
+        public readonly eint value;
 
-        public FontAtlas(EntityID value)
+        public FontAtlas(eint value)
         {
             this.value = value;
         }
