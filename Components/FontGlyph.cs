@@ -6,9 +6,9 @@ namespace Fonts.Components
     {
         public readonly eint value;
 
-        public FontGlyph(eint value)
+        public FontGlyph(Glyph glyph)
         {
-            this.value = value;
+            this.value = glyph.GetEntityValue();
         }
     }
 }

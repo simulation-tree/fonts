@@ -2,53 +2,36 @@
 using Simulation;
 using System;
 using System.Numerics;
+using Unmanaged;
 using Unmanaged.Collections;
 
 namespace Fonts
 {
-    public readonly struct Glyph : IDisposable
+    public readonly struct Glyph : IGlyph, IDisposable
     {
-        public readonly Entity entity;
+        private readonly Entity entity;
 
-        private readonly UnmanagedList<Kerning> kernings;
-
-        public readonly char Character => Component.character;
-        public readonly Vector2 Advance => Component.advance;
-        public readonly Vector2 Offset => Component.offset;
-        public readonly Vector2 Size => Component.size;
-
-        /// <summary>
-        /// Coordinates on the font's atlas texture.
-        /// </summary>
-        public readonly Vector4 Region => Component.region;
-
-        public readonly ReadOnlySpan<Kerning> Kernings => kernings.AsSpan();
-
-        private readonly IsGlyph Component
-        {
-            get
-            {
-                return entity.GetComponent<Entity, IsGlyph>();
-            }
-        }
+        eint IEntity.Value => entity.GetEntityValue();
+        World IEntity.World => entity.GetWorld();
 
         public Glyph(World world, eint existingEntity)
         {
             entity = new(world, existingEntity);
-            kernings = entity.GetList<Entity, Kerning>();
         }
 
         public Glyph(World world, char character, Vector2 advance, Vector2 offset, Vector2 size, Vector4 region, ReadOnlySpan<Kerning> kernings)
         {
             this.entity = new(world);
             entity.AddComponent(new IsGlyph(character, advance, offset, size, region));
-            this.kernings = entity.CreateList<Entity, Kerning>((uint)(kernings.Length + 1));
-            this.kernings.AddRange(kernings);
+
+            UnmanagedList<Kerning> kerningsList = entity.CreateList<Entity, Kerning>((uint)(kernings.Length + 1));
+            kerningsList.AddRange(kernings);
         }
 
         public readonly override string ToString()
         {
-            Span<char> buffer = ['\'', Character, '\''];
+            char character = this.GetCharacter();
+            Span<char> buffer = ['\'', character, '\''];
             return new string(buffer);
         }
 
@@ -57,48 +40,9 @@ namespace Fonts
             entity.Dispose();
         }
 
-        public readonly Vector2 GetKerning(char nextCharacter)
+        static Query IEntity.GetQuery(World world)
         {
-            foreach (Kerning kerning in Kernings)
-            {
-                if (kerning.nextCharacter == nextCharacter)
-                {
-                    return kerning.amount;
-                }
-            }
-
-            return default;
-        }
-
-        public readonly bool ContainsKerning(char nextCharacter)
-        {
-            foreach (Kerning kerning in Kernings)
-            {
-                if (kerning.nextCharacter == nextCharacter)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public readonly void AddKerning(char nextCharacter, Vector2 amount)
-        {
-            for (uint i = 0; i < kernings.Count; i++)
-            {
-                if (kernings[i].nextCharacter == nextCharacter)
-                {
-                    throw new ArgumentException($"Kerning for character '{nextCharacter}' already exists");
-                }
-            }
-
-            kernings.Add(new(nextCharacter, amount));
-        }
-
-        public readonly void ClearKernings()
-        {
-            kernings.Clear();
+            return new Query(world, RuntimeType.Get<IsGlyph>());
         }
     }
 }

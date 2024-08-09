@@ -1,4 +1,5 @@
 ﻿using Simulation;
+using Textures;
 
 namespace Fonts.Components
 {
@@ -9,6 +10,11 @@ namespace Fonts.Components
         public FontAtlas(eint value)
         {
             this.value = value;
+        }
+
+        public FontAtlas(Texture texture)
+        {
+            value = texture.GetEntityValue();
         }
     }
 }

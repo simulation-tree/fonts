@@ -4,14 +4,13 @@ using Fonts.Components;
 using Fonts.Events;
 using Simulation;
 using System;
-using Textures.Components;
 using Unmanaged;
 
 namespace Fonts
 {
     public readonly struct Font : IFont, IDisposable
     {
-        public readonly Entity entity;
+        private readonly Entity entity;
 
         World IEntity.World => entity.world;
         eint IEntity.Value => entity.value;
