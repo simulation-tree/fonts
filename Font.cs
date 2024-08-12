@@ -46,7 +46,7 @@ namespace Fonts
             return this.GetFamilyName().ToString();
         }
 
-        public static Query GetQuery(World world)
+        Query IEntity.GetQuery(World world)
         {
             return new(world, RuntimeType.Get<IsFont>());
         }
