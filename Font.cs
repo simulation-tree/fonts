@@ -4,6 +4,7 @@ using Fonts.Components;
 using Fonts.Events;
 using Simulation;
 using System;
+using Textures;
 using Unmanaged;
 
 namespace Fonts
@@ -11,6 +12,11 @@ namespace Fonts
     public readonly struct Font : IFont, IDisposable
     {
         private readonly Entity entity;
+
+        public readonly FixedString FamilyName => entity.GetComponent<FontName>().familyName;
+        public readonly float LineHeight => entity.GetComponent<FontMetrics>().lineHeight;
+        public readonly AtlasTexture AtlasTexture => new(entity.world, entity.GetComponent<FontAtlas>().value);
+        public readonly uint GlyphCount => entity.GetList<FontGlyph>().Count;
 
         World IEntity.World => entity.world;
         eint IEntity.Value => entity.value;
@@ -43,12 +49,17 @@ namespace Fonts
 
         public override string ToString()
         {
-            return this.GetFamilyName().ToString();
+            return this.FamilyName.ToString();
         }
 
         Query IEntity.GetQuery(World world)
         {
             return new(world, RuntimeType.Get<IsFont>());
+        }
+
+        public readonly Glyph GetGlyph(uint index)
+        {
+            return new(entity.world, entity.GetList<FontGlyph>()[index].value);
         }
     }
 }

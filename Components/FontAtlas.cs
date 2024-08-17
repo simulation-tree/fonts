@@ -14,7 +14,7 @@ namespace Fonts.Components
 
         public FontAtlas(Texture texture)
         {
-            value = texture.GetEntityValue();
+            value = ((Entity)texture).value;
         }
     }
 }

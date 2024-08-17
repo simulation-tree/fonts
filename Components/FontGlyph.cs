@@ -8,7 +8,7 @@ namespace Fonts.Components
 
         public FontGlyph(Glyph glyph)
         {
-            this.value = glyph.GetEntityValue();
+            this.value = ((Entity)glyph).value;
         }
     }
 }
