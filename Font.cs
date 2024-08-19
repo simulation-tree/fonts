@@ -36,10 +36,6 @@ namespace Fonts
             entity = new(world);
             entity.AddComponent(new IsDataRequest(address));
             entity.AddComponent(new IsFont());
-
-            world.Submit(new DataUpdate());
-            world.Submit(new FontUpdate());
-            world.Poll();
         }
 
         public readonly void Dispose()
