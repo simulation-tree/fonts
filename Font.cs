@@ -1,10 +1,7 @@
 ﻿using Data.Components;
-using Data.Events;
 using Fonts.Components;
-using Fonts.Events;
 using Simulation;
 using System;
-using Textures;
 using Unmanaged;
 
 namespace Fonts
@@ -15,16 +12,30 @@ namespace Fonts
 
         public readonly FixedString FamilyName => entity.GetComponent<FontName>().familyName;
         public readonly float LineHeight => entity.GetComponent<FontMetrics>().lineHeight;
-        public readonly AtlasTexture AtlasTexture => new(entity.world, entity.GetComponent<FontAtlas>().value);
         public readonly uint GlyphCount => entity.GetList<FontGlyph>().Count;
+        public readonly bool IsLoaded => entity.ContainsComponent<IsFont>();
+
+        public readonly Glyph this[uint index]
+        {
+            get
+            {
+                FontGlyph glyph = entity.GetListElement<FontGlyph>(index);
+                rint glyphReference = glyph.value;
+                eint glyphEntity = entity.GetReference(glyphReference);
+                return new(entity.world, glyphEntity);
+            }
+        }
 
         World IEntity.World => entity.world;
         eint IEntity.Value => entity.value;
 
+#if NET
+        [Obsolete("Default constructor not available", true)]
         public Font()
         {
-            throw new InvalidOperationException("Cannot create a font without a world.");
+            throw new Exception();
         }
+#endif
 
         public Font(World world, eint existingEntity)
         {
@@ -35,7 +46,14 @@ namespace Fonts
         {
             entity = new(world);
             entity.AddComponent(new IsDataRequest(address));
-            entity.AddComponent(new IsFont());
+            entity.AddComponent(new IsFontRequest());
+        }
+
+        public Font(World world, FixedString address)
+        {
+            entity = new(world);
+            entity.AddComponent(new IsDataRequest(address));
+            entity.AddComponent(new IsFontRequest());
         }
 
         public readonly void Dispose()
@@ -51,11 +69,6 @@ namespace Fonts
         Query IEntity.GetQuery(World world)
         {
             return new(world, RuntimeType.Get<IsFont>());
-        }
-
-        public readonly Glyph GetGlyph(uint index)
-        {
-            return new(entity.world, entity.GetList<FontGlyph>()[index].value);
         }
     }
 }

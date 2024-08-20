@@ -4,11 +4,11 @@ namespace Fonts.Components
 {
     public readonly struct FontGlyph
     {
-        public readonly eint value;
+        public readonly rint value;
 
-        public FontGlyph(Glyph glyph)
+        public FontGlyph(rint value)
         {
-            this.value = ((Entity)glyph).value;
+            this.value = value;
         }
     }
 }

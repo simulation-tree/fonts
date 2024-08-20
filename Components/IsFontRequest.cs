@@ -1,6 +1,6 @@
 ﻿namespace Fonts.Components
 {
-    public struct IsFont
+    public struct IsFontRequest
     {
         public uint version;
     }

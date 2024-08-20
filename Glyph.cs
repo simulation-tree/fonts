@@ -47,15 +47,6 @@ namespace Fonts
             }
         }
 
-        public readonly Vector4 Region
-        {
-            get
-            {
-                IsGlyph component = entity.GetComponent<IsGlyph>();
-                return component.region;
-            }
-        }
-
         public readonly ReadOnlySpan<Kerning> Kernings => entity.GetList<Kerning>().AsSpan();
 
         eint IEntity.Value => entity.value;
@@ -66,10 +57,10 @@ namespace Fonts
             entity = new(world, existingEntity);
         }
 
-        public Glyph(World world, char character, Vector2 advance, Vector2 offset, Vector2 size, Vector4 region, ReadOnlySpan<Kerning> kernings)
+        public Glyph(World world, char character, Vector2 advance, Vector2 offset, Vector2 size, ReadOnlySpan<Kerning> kernings)
         {
             this.entity = new(world);
-            entity.AddComponent(new IsGlyph(character, advance, offset, size, region));
+            entity.AddComponent(new IsGlyph(character, advance, offset, size));
 
             UnmanagedList<Kerning> kerningsList = entity.CreateList<Kerning>((uint)(kernings.Length + 1));
             kerningsList.AddRange(kernings);

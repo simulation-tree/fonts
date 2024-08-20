@@ -8,15 +8,13 @@ namespace Fonts.Components
         public readonly Vector2 advance;
         public readonly Vector2 offset;
         public readonly Vector2 size;
-        public readonly Vector4 region;
 
-        public IsGlyph(char character, Vector2 advance, Vector2 offset, Vector2 size, Vector4 region)
+        public IsGlyph(char character, Vector2 advance, Vector2 offset, Vector2 size)
         {
             this.character = character;
             this.advance = advance;
             this.offset = offset;
             this.size = size;
-            this.region = region;
         }
     }
 }
