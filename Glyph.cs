@@ -20,6 +20,9 @@ namespace Fonts
             }
         }
 
+        /// <summary>
+        /// Amount of distance to move the cursor when laying out text.
+        /// </summary>
         public readonly Vector2 Advance
         {
             get
@@ -29,6 +32,22 @@ namespace Fonts
             }
         }
 
+        /// <summary>
+        /// Distance away from the cursor position on the baseline.
+        /// </summary>
+        public readonly Vector2 Bearing
+        {
+            get
+            {
+                IsGlyph component = entity.GetComponent<IsGlyph>();
+                return component.bearing;
+            }
+        }
+
+        /// <summary>
+        /// Distance away from the top left corner in the image
+        /// where the glyph begins.
+        /// </summary>
         public readonly Vector2 Offset
         {
             get
@@ -38,6 +57,9 @@ namespace Fonts
             }
         }
 
+        /// <summary>
+        /// Size of this glyph's bounding box.
+        /// </summary>
         public readonly Vector2 Size
         {
             get
@@ -57,10 +79,10 @@ namespace Fonts
             entity = new(world, existingEntity);
         }
 
-        public Glyph(World world, char character, Vector2 advance, Vector2 offset, Vector2 size, ReadOnlySpan<Kerning> kernings)
+        public Glyph(World world, char character, Vector2 advance, Vector2 bearing, Vector2 offset, Vector2 size, ReadOnlySpan<Kerning> kernings)
         {
             this.entity = new(world);
-            entity.AddComponent(new IsGlyph(character, advance, offset, size));
+            entity.AddComponent(new IsGlyph(character, advance, bearing, offset, size));
 
             UnmanagedList<Kerning> kerningsList = entity.CreateList<Kerning>((uint)(kernings.Length + 1));
             kerningsList.AddRange(kernings);
