@@ -23,7 +23,7 @@ namespace Fonts
         /// <summary>
         /// Amount of distance to move the cursor when laying out text.
         /// </summary>
-        public readonly Vector2 Advance
+        public readonly (int x, int y) Advance
         {
             get
             {
@@ -35,7 +35,7 @@ namespace Fonts
         /// <summary>
         /// Distance away from the cursor position on the baseline.
         /// </summary>
-        public readonly Vector2 Bearing
+        public readonly (int x, int y) Bearing
         {
             get
             {
@@ -48,7 +48,7 @@ namespace Fonts
         /// Distance away from the top left corner in the image
         /// where the glyph begins.
         /// </summary>
-        public readonly Vector2 Offset
+        public readonly (int x, int y) Offset
         {
             get
             {
@@ -60,7 +60,7 @@ namespace Fonts
         /// <summary>
         /// Size of this glyph's bounding box.
         /// </summary>
-        public readonly Vector2 Size
+        public readonly (int x, int y) Size
         {
             get
             {
@@ -79,7 +79,7 @@ namespace Fonts
             entity = new(world, existingEntity);
         }
 
-        public Glyph(World world, char character, Vector2 advance, Vector2 bearing, Vector2 offset, Vector2 size, ReadOnlySpan<Kerning> kernings)
+        public Glyph(World world, char character, (int x, int y) advance, (int x, int y) bearing, (int x, int y) offset, (int x, int y) size, ReadOnlySpan<Kerning> kernings)
         {
             this.entity = new(world);
             entity.AddComponent(new IsGlyph(character, advance, bearing, offset, size));

@@ -6,12 +6,16 @@ using Unmanaged;
 
 namespace Fonts
 {
+    /// <summary>
+    /// Contains a list of <see cref="Glyph"/> entities sorted by
+    /// their unicode character.
+    /// </summary>
     public readonly struct Font : IFont, IDisposable
     {
         private readonly Entity entity;
 
         public readonly FixedString FamilyName => entity.GetComponent<FontName>().familyName;
-        public readonly float LineHeight => entity.GetComponent<FontMetrics>().lineHeight;
+        public readonly uint LineHeight => entity.GetComponent<FontMetrics>().lineHeight;
         public readonly uint GlyphCount => entity.GetList<FontGlyph>().Count;
 
         public readonly Glyph this[uint index]

@@ -1,16 +1,14 @@
-﻿using System.Numerics;
-
-namespace Fonts.Components
+﻿namespace Fonts.Components
 {
     public readonly struct IsGlyph
     {
         public readonly char character;
-        public readonly Vector2 advance;
-        public readonly Vector2 bearing;
-        public readonly Vector2 offset;
-        public readonly Vector2 size;
+        public readonly (int x, int y) advance;
+        public readonly (int x, int y) bearing;
+        public readonly (int x, int y) offset;
+        public readonly (int x, int y) size;
 
-        public IsGlyph(char character, Vector2 advance, Vector2 bearing, Vector2 offset, Vector2 size)
+        public IsGlyph(char character, (int x, int y) advance, (int x, int y) bearing, (int x, int y) offset, (int x, int y) size)
         {
             this.character = character;
             this.advance = advance;

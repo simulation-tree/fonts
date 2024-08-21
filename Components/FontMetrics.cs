@@ -2,9 +2,9 @@
 {
     public readonly struct FontMetrics
     {
-        public readonly float lineHeight;
+        public readonly uint lineHeight;
 
-        public FontMetrics(float lineHeight)
+        public FontMetrics(uint lineHeight)
         {
             this.lineHeight = lineHeight;
         }
