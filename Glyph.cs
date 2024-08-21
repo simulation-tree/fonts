@@ -49,8 +49,8 @@ namespace Fonts
 
         public readonly ReadOnlySpan<Kerning> Kernings => entity.GetList<Kerning>().AsSpan();
 
-        eint IEntity.Value => entity.value;
-        World IEntity.World => entity.world;
+        eint IEntity.Value => entity;
+        World IEntity.World => entity;
 
         public Glyph(World world, eint existingEntity)
         {

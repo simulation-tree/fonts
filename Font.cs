@@ -13,7 +13,6 @@ namespace Fonts
         public readonly FixedString FamilyName => entity.GetComponent<FontName>().familyName;
         public readonly float LineHeight => entity.GetComponent<FontMetrics>().lineHeight;
         public readonly uint GlyphCount => entity.GetList<FontGlyph>().Count;
-        public readonly bool IsLoaded => entity.ContainsComponent<IsFont>();
 
         public readonly Glyph this[uint index]
         {
@@ -22,12 +21,12 @@ namespace Fonts
                 FontGlyph glyph = entity.GetListElement<FontGlyph>(index);
                 rint glyphReference = glyph.value;
                 eint glyphEntity = entity.GetReference(glyphReference);
-                return new(entity.world, glyphEntity);
+                return new(entity, glyphEntity);
             }
         }
 
-        World IEntity.World => entity.world;
-        eint IEntity.Value => entity.value;
+        World IEntity.World => entity;
+        eint IEntity.Value => entity;
 
 #if NET
         [Obsolete("Default constructor not available", true)]
@@ -69,6 +68,11 @@ namespace Fonts
         Query IEntity.GetQuery(World world)
         {
             return new(world, RuntimeType.Get<IsFont>());
+        }
+
+        public static implicit operator Entity(Font font)
+        {
+            return font.entity;
         }
     }
 }
