@@ -66,7 +66,21 @@ namespace Fonts
 
         public override string ToString()
         {
-            return this.FamilyName.ToString();
+            Span<char> buffer = stackalloc char[256];
+            int length = ToString(buffer);
+            return new string(buffer[..length]);
+        }
+
+        public readonly int ToString(Span<char> buffer)
+        {
+            int length = FamilyName.ToString(buffer);
+            buffer[length++] = ' ';
+            buffer[length++] = '(';
+            buffer[length++] = '`';
+            length += entity.ToString(buffer[length..]);
+            buffer[length++] = '`';
+            buffer[length++] = ')';
+            return length;
         }
 
         Query IEntity.GetQuery(World world)
