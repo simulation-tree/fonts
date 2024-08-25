@@ -16,13 +16,13 @@ namespace Fonts
 
         public readonly FixedString FamilyName => entity.GetComponent<FontName>().familyName;
         public readonly uint LineHeight => entity.GetComponent<FontMetrics>().lineHeight;
-        public readonly uint GlyphCount => entity.GetList<FontGlyph>().Count;
+        public readonly uint GlyphCount => entity.GetArrayLength<FontGlyph>();
 
         public readonly Glyph this[uint index]
         {
             get
             {
-                FontGlyph glyph = entity.GetListElement<FontGlyph>(index);
+                FontGlyph glyph = entity.GetArrayElement<FontGlyph>(index);
                 rint glyphReference = glyph.value;
                 eint glyphEntity = entity.GetReference(glyphReference);
                 return new(entity, glyphEntity);

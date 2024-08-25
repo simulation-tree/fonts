@@ -3,7 +3,6 @@ using Simulation;
 using System;
 using System.Numerics;
 using Unmanaged;
-using Unmanaged.Collections;
 
 namespace Fonts
 {
@@ -69,7 +68,7 @@ namespace Fonts
             }
         }
 
-        public readonly ReadOnlySpan<Kerning> Kernings => entity.GetList<Kerning>().AsSpan();
+        public readonly ReadOnlySpan<Kerning> Kernings => entity.GetArray<Kerning>();
 
         eint IEntity.Value => entity;
         World IEntity.World => entity;
@@ -83,9 +82,7 @@ namespace Fonts
         {
             this.entity = new(world);
             entity.AddComponent(new IsGlyph(character, advance, bearing, offset, size));
-
-            UnmanagedList<Kerning> kerningsList = entity.CreateList<Kerning>((uint)(kernings.Length + 1));
-            kerningsList.AddRange(kernings);
+            entity.CreateArray(kernings);
         }
 
         public readonly override string ToString()
@@ -107,7 +104,7 @@ namespace Fonts
 
         public readonly Vector2 GetKerning(char nextCharacter)
         {
-            UnmanagedList<Kerning> kernings = entity.GetList<Kerning>();
+            Span<Kerning> kernings = entity.GetArray<Kerning>();
             foreach (Kerning kerning in kernings)
             {
                 if (kerning.nextCharacter == nextCharacter)
@@ -121,7 +118,7 @@ namespace Fonts
 
         public readonly bool ContainsKerning(char nextCharacter)
         {
-            UnmanagedList<Kerning> kernings = entity.GetList<Kerning>();
+            Span<Kerning> kernings = entity.GetArray<Kerning>();
             foreach (Kerning kerning in kernings)
             {
                 if (kerning.nextCharacter == nextCharacter)
@@ -135,22 +132,22 @@ namespace Fonts
 
         public readonly void AddKerning(char nextCharacter, Vector2 amount)
         {
-            UnmanagedList<Kerning> kernings = entity.GetList<Kerning>();
-            for (uint i = 0; i < kernings.Count; i++)
+            Span<Kerning> kernings = entity.GetArray<Kerning>();
+            for (uint i = 0; i < kernings.Length; i++)
             {
-                if (kernings[i].nextCharacter == nextCharacter)
+                if (kernings[(int)i].nextCharacter == nextCharacter)
                 {
                     throw new ArgumentException($"Kerning for character '{nextCharacter}' already exists");
                 }
             }
 
-            kernings.Add(new(nextCharacter, amount));
+            kernings = entity.ResizeArray<Kerning>((uint)kernings.Length + 1);
+            kernings[(int)kernings.Length - 1] = new(nextCharacter, amount);
         }
 
         public readonly void ClearKernings()
         {
-            UnmanagedList<Kerning> kernings = entity.GetList<Kerning>();
-            kernings.Clear();
+            entity.ResizeArray<Kerning>(0);
         }
 
         public static implicit operator Entity(Glyph glyph)
