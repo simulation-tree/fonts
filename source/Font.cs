@@ -10,7 +10,7 @@ namespace Fonts
     /// Contains a list of <see cref="Glyph"/> entities sorted by
     /// their unicode character.
     /// </summary>
-    public readonly struct Font : IFont, IDisposable
+    public readonly struct Font : IFont
     {
         private readonly Entity entity;
 
@@ -57,11 +57,6 @@ namespace Fonts
             entity = new(world);
             entity.AddComponent(new IsDataRequest(address));
             entity.AddComponent(new IsFontRequest());
-        }
-
-        public readonly void Dispose()
-        {
-            entity.Dispose();
         }
 
         public override string ToString()

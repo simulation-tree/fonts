@@ -6,7 +6,7 @@ using Unmanaged;
 
 namespace Fonts
 {
-    public readonly struct Glyph : IGlyph, IDisposable
+    public readonly struct Glyph : IGlyph
     {
         private readonly Entity entity;
 
@@ -90,11 +90,6 @@ namespace Fonts
             char character = Character;
             Span<char> buffer = ['\'', character, '\''];
             return new string(buffer);
-        }
-
-        public readonly void Dispose()
-        {
-            entity.Dispose();
         }
 
         Query IEntity.GetQuery(World world)
