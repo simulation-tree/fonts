@@ -70,10 +70,10 @@ namespace Fonts
 
         public readonly ReadOnlySpan<Kerning> Kernings => entity.GetArray<Kerning>();
 
-        eint IEntity.Value => entity;
+        uint IEntity.Value => entity;
         World IEntity.World => entity;
 
-        public Glyph(World world, eint existingEntity)
+        public Glyph(World world, uint existingEntity)
         {
             entity = new(world, existingEntity);
         }

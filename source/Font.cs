@@ -24,13 +24,13 @@ namespace Fonts
             {
                 FontGlyph glyph = entity.GetArrayElement<FontGlyph>(index);
                 rint glyphReference = glyph.value;
-                eint glyphEntity = entity.GetReference(glyphReference);
+                uint glyphEntity = entity.GetReference(glyphReference);
                 return new(entity, glyphEntity);
             }
         }
 
         World IEntity.World => entity;
-        eint IEntity.Value => entity;
+        uint IEntity.Value => entity;
 
 #if NET
         [Obsolete("Default constructor not available", true)]
@@ -40,7 +40,7 @@ namespace Fonts
         }
 #endif
 
-        public Font(World world, eint existingEntity)
+        public Font(World world, uint existingEntity)
         {
             entity = new(world, existingEntity);
         }
