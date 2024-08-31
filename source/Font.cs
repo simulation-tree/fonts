@@ -14,8 +14,8 @@ namespace Fonts
     {
         private readonly Entity entity;
 
-        public readonly FixedString FamilyName => entity.GetComponent<FontName>().familyName;
-        public readonly uint LineHeight => entity.GetComponent<FontMetrics>().lineHeight;
+        public readonly FixedString FamilyName => entity.GetComponentRef<FontName>().familyName;
+        public readonly uint LineHeight => entity.GetComponentRef<FontMetrics>().lineHeight;
         public readonly uint GlyphCount => entity.GetArrayLength<FontGlyph>();
 
         public readonly Glyph this[uint index]

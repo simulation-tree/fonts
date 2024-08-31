@@ -14,7 +14,7 @@ namespace Fonts
         {
             get
             {
-                IsGlyph component = entity.GetComponent<IsGlyph>();
+                IsGlyph component = entity.GetComponentRef<IsGlyph>();
                 return component.character;
             }
         }
@@ -26,7 +26,7 @@ namespace Fonts
         {
             get
             {
-                IsGlyph component = entity.GetComponent<IsGlyph>();
+                IsGlyph component = entity.GetComponentRef<IsGlyph>();
                 return component.advance;
             }
         }
@@ -38,7 +38,7 @@ namespace Fonts
         {
             get
             {
-                IsGlyph component = entity.GetComponent<IsGlyph>();
+                IsGlyph component = entity.GetComponentRef<IsGlyph>();
                 return component.bearing;
             }
         }
@@ -51,7 +51,7 @@ namespace Fonts
         {
             get
             {
-                IsGlyph component = entity.GetComponent<IsGlyph>();
+                IsGlyph component = entity.GetComponentRef<IsGlyph>();
                 return component.offset;
             }
         }
@@ -63,7 +63,7 @@ namespace Fonts
         {
             get
             {
-                IsGlyph component = entity.GetComponent<IsGlyph>();
+                IsGlyph component = entity.GetComponentRef<IsGlyph>();
                 return component.size;
             }
         }
