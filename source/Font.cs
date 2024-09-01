@@ -22,7 +22,7 @@ namespace Fonts
         {
             get
             {
-                FontGlyph glyph = entity.GetArrayElement<FontGlyph>(index);
+                FontGlyph glyph = entity.GetArrayElementRef<FontGlyph>(index);
                 rint glyphReference = glyph.value;
                 uint glyphEntity = entity.GetReference(glyphReference);
                 return new(entity, glyphEntity);
