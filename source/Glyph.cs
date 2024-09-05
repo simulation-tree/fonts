@@ -8,7 +8,7 @@ namespace Fonts
 {
     public readonly struct Glyph : IGlyph
     {
-        private readonly Entity entity;
+        public readonly Entity entity;
 
         public readonly char Character
         {
@@ -68,38 +68,34 @@ namespace Fonts
             }
         }
 
-        public readonly ReadOnlySpan<Kerning> Kernings => entity.GetArray<Kerning>();
+        public readonly USpan<Kerning> Kernings => entity.GetArray<Kerning>();
 
-        uint IEntity.Value => entity;
-        World IEntity.World => entity;
+        readonly uint IEntity.Value => entity.value;
+        readonly World IEntity.World => entity.world;
+        readonly Definition IEntity.Definition => new([RuntimeType.Get<IsGlyph>()], [RuntimeType.Get<Kerning>()]);
 
         public Glyph(World world, uint existingEntity)
         {
             entity = new(world, existingEntity);
         }
 
-        public Glyph(World world, char character, (int x, int y) advance, (int x, int y) bearing, (int x, int y) offset, (int x, int y) size, ReadOnlySpan<Kerning> kernings)
+        public Glyph(World world, char character, (int x, int y) advance, (int x, int y) bearing, (int x, int y) offset, (int x, int y) size, USpan<Kerning> kernings)
         {
             this.entity = new(world);
             entity.AddComponent(new IsGlyph(character, advance, bearing, offset, size));
             entity.CreateArray(kernings);
         }
 
-        public readonly override string ToString()
+        public unsafe readonly override string ToString()
         {
             char character = Character;
-            Span<char> buffer = ['\'', character, '\''];
-            return new string(buffer);
-        }
-
-        Query IEntity.GetQuery(World world)
-        {
-            return new Query(world, RuntimeType.Get<IsGlyph>());
+            USpan<char> buffer = ['\'', character, '\''];
+            return new string(buffer.pointer, 0, 3);
         }
 
         public readonly Vector2 GetKerning(char nextCharacter)
         {
-            Span<Kerning> kernings = entity.GetArray<Kerning>();
+            USpan<Kerning> kernings = entity.GetArray<Kerning>();
             foreach (Kerning kerning in kernings)
             {
                 if (kerning.nextCharacter == nextCharacter)
@@ -113,7 +109,7 @@ namespace Fonts
 
         public readonly bool ContainsKerning(char nextCharacter)
         {
-            Span<Kerning> kernings = entity.GetArray<Kerning>();
+            USpan<Kerning> kernings = entity.GetArray<Kerning>();
             foreach (Kerning kerning in kernings)
             {
                 if (kerning.nextCharacter == nextCharacter)
@@ -127,27 +123,22 @@ namespace Fonts
 
         public readonly void AddKerning(char nextCharacter, Vector2 amount)
         {
-            Span<Kerning> kernings = entity.GetArray<Kerning>();
-            for (uint i = 0; i < kernings.Length; i++)
+            USpan<Kerning> kernings = entity.GetArray<Kerning>();
+            for (uint i = 0; i < kernings.length; i++)
             {
-                if (kernings[(int)i].nextCharacter == nextCharacter)
+                if (kernings[i].nextCharacter == nextCharacter)
                 {
                     throw new ArgumentException($"Kerning for character '{nextCharacter}' already exists");
                 }
             }
 
-            kernings = entity.ResizeArray<Kerning>((uint)kernings.Length + 1);
-            kernings[(int)kernings.Length - 1] = new(nextCharacter, amount);
+            kernings = entity.ResizeArray<Kerning>(kernings.length + 1);
+            kernings[kernings.length - 1] = new(nextCharacter, amount);
         }
 
         public readonly void ClearKernings()
         {
             entity.ResizeArray<Kerning>(0);
-        }
-
-        public static implicit operator Entity(Glyph glyph)
-        {
-            return glyph.entity;
         }
     }
 }

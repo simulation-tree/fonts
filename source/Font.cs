@@ -12,7 +12,7 @@ namespace Fonts
     /// </summary>
     public readonly struct Font : IFont
     {
-        private readonly Entity entity;
+        public readonly Entity entity;
 
         public readonly FixedString FamilyName => entity.GetComponentRef<FontName>().familyName;
         public readonly uint LineHeight => entity.GetComponentRef<FontMetrics>().lineHeight;
@@ -25,12 +25,13 @@ namespace Fonts
                 FontGlyph glyph = entity.GetArrayElementRef<FontGlyph>(index);
                 rint glyphReference = glyph.value;
                 uint glyphEntity = entity.GetReference(glyphReference);
-                return new(entity, glyphEntity);
+                return new(entity.world, glyphEntity);
             }
         }
 
-        World IEntity.World => entity;
-        uint IEntity.Value => entity;
+        readonly World IEntity.World => entity.world;
+        readonly uint IEntity.Value => entity.value;
+        readonly Definition IEntity.Definition => new([RuntimeType.Get<IsFont>()], [RuntimeType.Get<FontGlyph>()]);
 
 #if NET
         [Obsolete("Default constructor not available", true)]
@@ -45,7 +46,7 @@ namespace Fonts
             entity = new(world, existingEntity);
         }
 
-        public Font(World world, ReadOnlySpan<char> address)
+        public Font(World world, USpan<char> address)
         {
             entity = new(world);
             entity.AddComponent(new IsDataRequest(address));
@@ -59,33 +60,30 @@ namespace Fonts
             entity.AddComponent(new IsFontRequest());
         }
 
-        public override string ToString()
+        public Font(World world, string address)
         {
-            Span<char> buffer = stackalloc char[256];
-            int length = ToString(buffer);
-            return new string(buffer[..length]);
+            entity = new(world);
+            entity.AddComponent(new IsDataRequest(address));
+            entity.AddComponent(new IsFontRequest());
         }
 
-        public readonly int ToString(Span<char> buffer)
+        public unsafe readonly override string ToString()
         {
-            int length = FamilyName.ToString(buffer);
+            USpan<char> buffer = stackalloc char[256];
+            uint length = ToString(buffer);
+            return new string(buffer.pointer, 0, (int)length);
+        }
+
+        public readonly uint ToString(USpan<char> buffer)
+        {
+            uint length = FamilyName.CopyTo(buffer);
             buffer[length++] = ' ';
             buffer[length++] = '(';
             buffer[length++] = '`';
-            length += entity.ToString(buffer[length..]);
+            length += entity.ToString(buffer.Slice(length));
             buffer[length++] = '`';
             buffer[length++] = ')';
             return length;
-        }
-
-        Query IEntity.GetQuery(World world)
-        {
-            return new(world, RuntimeType.Get<IsFont>());
-        }
-
-        public static implicit operator Entity(Font font)
-        {
-            return font.entity;
         }
     }
 }

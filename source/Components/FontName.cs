@@ -1,5 +1,4 @@
-﻿using System;
-using Unmanaged;
+﻿using Unmanaged;
 
 namespace Fonts.Components
 {
@@ -7,9 +6,9 @@ namespace Fonts.Components
     {
         public readonly FixedString familyName;
 
-        public FontName(ReadOnlySpan<char> familyName)
+        public FontName(USpan<char> familyName)
         {
-            this.familyName = new FixedString(familyName);
+            this.familyName = new(familyName);
         }
 
         public FontName(FixedString familyName)
