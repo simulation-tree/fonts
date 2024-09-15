@@ -124,7 +124,7 @@ namespace Fonts
         public readonly void AddKerning(char nextCharacter, Vector2 amount)
         {
             USpan<Kerning> kernings = entity.GetArray<Kerning>();
-            for (uint i = 0; i < kernings.length; i++)
+            for (uint i = 0; i < kernings.Length; i++)
             {
                 if (kernings[i].nextCharacter == nextCharacter)
                 {
@@ -132,8 +132,8 @@ namespace Fonts
                 }
             }
 
-            kernings = entity.ResizeArray<Kerning>(kernings.length + 1);
-            kernings[kernings.length - 1] = new(nextCharacter, amount);
+            kernings = entity.ResizeArray<Kerning>(kernings.Length + 1);
+            kernings[kernings.Length - 1] = new(nextCharacter, amount);
         }
 
         public readonly void ClearKernings()
