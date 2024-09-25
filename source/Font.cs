@@ -10,7 +10,7 @@ namespace Fonts
     /// Contains a list of <see cref="Glyph"/> entities sorted by
     /// their unicode character.
     /// </summary>
-    public readonly struct Font : IFont
+    public readonly struct Font : IFont, IEquatable<Font>
     {
         public readonly Entity entity;
 
@@ -37,7 +37,7 @@ namespace Fonts
         [Obsolete("Default constructor not available", true)]
         public Font()
         {
-            throw new Exception();
+            throw new NotImplementedException();
         }
 #endif
 
@@ -84,6 +84,31 @@ namespace Fonts
             buffer[length++] = '`';
             buffer[length++] = ')';
             return length;
+        }
+
+        public readonly override bool Equals(object? obj)
+        {
+            return obj is Font font && Equals(font);
+        }
+
+        public readonly bool Equals(Font other)
+        {
+            return entity.Equals(other.entity);
+        }
+
+        public readonly override int GetHashCode()
+        {
+            return HashCode.Combine(entity);
+        }
+
+        public static bool operator ==(Font left, Font right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Font left, Font right)
+        {
+            return !(left == right);
         }
     }
 }
