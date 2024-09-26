@@ -95,6 +95,36 @@ namespace Fonts
             return GenerateVertices(text, temp, pixelSize);
         }
 
+        /// <summary>
+        /// Retrieves the index to the closest character at the given vertex position.
+        /// </summary>
+        public readonly bool TryIndexOf(USpan<char> text, uint pixelSize, Vector2 vertexPosition, out uint index)
+        {
+            if (text.Length == 0)
+            {
+                index = 0;
+                return false;
+            }
+
+            USpan<Vector3> temp = stackalloc Vector3[(int)(text.Length * 4)];
+            Vector2 maxPosition = GenerateVertices(text, temp, pixelSize);
+            float closestDistance = float.MaxValue;
+            uint closestIndex = 0;
+            for (uint i = 0; i < text.Length; i++)
+            {
+                Vector3 first = temp[(i * 4) + 0];
+                float distanceSquared = Vector2.DistanceSquared(vertexPosition, new Vector2(first.X, first.Y));
+                if (distanceSquared < closestDistance)
+                {
+                    closestDistance = distanceSquared;
+                    closestIndex = i;
+                }
+            }
+
+            index = closestIndex;
+            return true;
+        }
+
         public readonly Vector2 GenerateVertices(USpan<char> text, USpan<Vector3> vertices, uint pixelSize)
         {
             uint lineHeight = LineHeight;
