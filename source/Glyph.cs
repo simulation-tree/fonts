@@ -90,7 +90,7 @@ namespace Fonts
         {
             char character = Character;
             USpan<char> buffer = ['\'', character, '\''];
-            return new string(buffer.pointer, 0, 3);
+            return buffer.ToString();
         }
 
         public readonly Vector2 GetKerning(char nextCharacter)
