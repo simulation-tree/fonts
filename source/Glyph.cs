@@ -70,8 +70,8 @@ namespace Fonts
 
         public readonly USpan<Kerning> Kernings => entity.GetArray<Kerning>();
 
-        readonly uint IEntity.Value => entity.value;
-        readonly World IEntity.World => entity.world;
+        readonly uint IEntity.Value => entity.GetEntityValue();
+        readonly World IEntity.World => entity.GetWorld();
         readonly Definition IEntity.Definition => new([RuntimeType.Get<IsGlyph>()], [RuntimeType.Get<Kerning>()]);
 
         public Glyph(World world, uint existingEntity)
@@ -84,6 +84,11 @@ namespace Fonts
             this.entity = new(world);
             entity.AddComponent(new IsGlyph(character, advance, bearing, offset, size));
             entity.CreateArray(kernings);
+        }
+
+        public readonly void Dispose()
+        {
+            entity.Dispose();
         }
 
         public unsafe readonly override string ToString()

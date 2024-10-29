@@ -4,8 +4,6 @@ using Simulation;
 using System;
 using System.Numerics;
 using Unmanaged;
-using static System.Net.Mime.MediaTypeNames;
-using Unmanaged.Collections;
 
 namespace Fonts
 {
@@ -68,6 +66,11 @@ namespace Fonts
             entity = new(world);
             entity.AddComponent(new IsDataRequest(address));
             entity.AddComponent(new IsFontRequest());
+        }
+
+        public readonly void Dispose()
+        {
+            entity.Dispose();
         }
 
         public unsafe readonly override string ToString()
