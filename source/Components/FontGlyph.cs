@@ -1,7 +1,8 @@
-﻿using Simulation;
+﻿using Worlds;
 
 namespace Fonts.Components
 {
+    [Array]
     public readonly struct FontGlyph
     {
         public readonly rint value;

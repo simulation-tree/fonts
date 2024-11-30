@@ -1,9 +1,9 @@
 ﻿using Data.Components;
 using Fonts.Components;
-using Simulation;
 using System;
 using System.Numerics;
 using Unmanaged;
+using Worlds;
 
 namespace Fonts
 {
@@ -13,7 +13,7 @@ namespace Fonts
     /// </summary>
     public readonly struct Font : IFont, IEquatable<Font>
     {
-        public readonly Entity entity;
+        private readonly Entity entity;
 
         public readonly FixedString FamilyName => entity.GetComponentRef<FontName>().familyName;
         public readonly uint LineHeight => entity.GetComponentRef<FontMetrics>().lineHeight;
@@ -204,6 +204,11 @@ namespace Fonts
         public static bool operator !=(Font left, Font right)
         {
             return !(left == right);
+        }
+
+        public static implicit operator Entity(Font font)
+        {
+            return font.entity;
         }
     }
 }

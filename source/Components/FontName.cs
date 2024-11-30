@@ -1,7 +1,9 @@
 ﻿using Unmanaged;
+using Worlds;
 
 namespace Fonts.Components
 {
+    [Component]
     public readonly struct FontName
     {
         public readonly FixedString familyName;

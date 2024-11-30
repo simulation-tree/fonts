@@ -1,7 +1,10 @@
 ﻿using System.Numerics;
+using Unmanaged;
+using Worlds;
 
 namespace Fonts
 {
+    [Array]
     public readonly struct Kerning
     {
         public readonly char nextCharacter;
@@ -15,7 +18,19 @@ namespace Fonts
 
         public readonly override string ToString()
         {
-            return $"Character: {nextCharacter}, Amount: {amount}";
+            USpan<char> buffer = stackalloc char[128];
+            uint length = ToString(buffer);
+            return buffer.Slice(0, length).ToString();
+        }
+
+        public readonly uint ToString(USpan<char> buffer)
+        {
+            uint length = 0;
+            length += "Character: ".AsUSpan().CopyTo(buffer);
+            buffer[length++] = nextCharacter;
+            length += ", Amount: ".AsUSpan().CopyTo(buffer.Slice(length));
+            length += amount.ToString(buffer.Slice(length));
+            return length;
         }
     }
 }

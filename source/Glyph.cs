@@ -1,14 +1,14 @@
 ﻿using Fonts.Components;
-using Simulation;
 using System;
 using System.Numerics;
 using Unmanaged;
+using Worlds;
 
 namespace Fonts
 {
     public readonly struct Glyph : IGlyph
     {
-        public readonly Entity entity;
+        private readonly Entity entity;
 
         public readonly char Character
         {
@@ -72,7 +72,7 @@ namespace Fonts
 
         readonly uint IEntity.Value => entity.GetEntityValue();
         readonly World IEntity.World => entity.GetWorld();
-        readonly Definition IEntity.Definition => new([RuntimeType.Get<IsGlyph>()], [RuntimeType.Get<Kerning>()]);
+        readonly Definition IEntity.Definition => new Definition().AddComponentType<IsGlyph>().AddArrayType<Kerning>();
 
         public Glyph(World world, uint existingEntity)
         {
@@ -144,6 +144,11 @@ namespace Fonts
         public readonly void ClearKernings()
         {
             entity.ResizeArray<Kerning>(0);
+        }
+
+        public static implicit operator Entity(Glyph glyph)
+        {
+            return glyph.entity;
         }
     }
 }

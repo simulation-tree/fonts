@@ -1,5 +1,8 @@
-﻿namespace Fonts.Components
+﻿using Worlds;
+
+namespace Fonts.Components
 {
+    [Component]
     public readonly struct FontMetrics
     {
         public readonly uint lineHeight;
