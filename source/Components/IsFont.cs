@@ -6,5 +6,10 @@ namespace Fonts.Components
     public struct IsFont
     {
         public uint version;
+
+        public IsFont(uint version)
+        {
+            this.version = version;
+        }
     }
 }
