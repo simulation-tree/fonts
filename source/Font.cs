@@ -99,7 +99,7 @@ namespace Fonts
         public readonly Vector2 CalulcateSize(USpan<char> text)
         {
             USpan<Vector3> temp = stackalloc Vector3[(int)(text.Length * 4)];
-            return GenerateVertices(text, temp);
+            return GenerateVertices(text, temp).maxPosition;
         }
 
         /// <summary>
@@ -114,11 +114,26 @@ namespace Fonts
             }
 
             USpan<Vector3> temp = stackalloc Vector3[(int)(text.Length * 4)];
-            Vector2 maxPosition = GenerateVertices(text, temp);
+            (Vector2 maxPosition, uint vertexCount) = GenerateVertices(text, temp);
             float closestDistance = float.MaxValue;
             uint closestIndex = 0;
             for (uint i = 0; i < text.Length; i++)
             {
+                char c = text[i];
+                if (c == '\n')
+                {
+                    continue;
+                }
+                else if (c == '\r')
+                {
+                    if (i < text.Length - 1 && text[i + 1] == '\n')
+                    {
+                        i++;
+                    }
+
+                    continue;
+                }
+
                 Vector3 first = temp[(i * 4) + 0];
                 float distanceSquared = Vector2.DistanceSquared(vertexPosition, new Vector2(first.X, first.Y));
                 if (distanceSquared < closestDistance)
@@ -132,28 +147,28 @@ namespace Fonts
             return true;
         }
 
-        public readonly Vector2 GenerateVertices(USpan<char> text, USpan<Vector3> vertices)
+        public readonly (Vector2 maxPosition, uint vertexCount) GenerateVertices(USpan<char> text, USpan<Vector3> vertices)
         {
             uint lineHeight = LineHeight;
             int penX = 0;
             int penY = 0;
             uint pixelSize = entity.GetComponent<IsFontRequest>().pixelSize;
-            Vector2 maxPosition = default;
             World world = entity.GetWorld();
             USpan<FontGlyph> glyphs = entity.GetArray<FontGlyph>();
+            uint vertexIndex = 0;
             for (uint i = 0; i < text.Length; i++)
             {
                 char c = text[i];
                 if (c == '\n')
                 {
                     penX = 0;
-                    penY -= (int)lineHeight;
+                    penY -= (int)(lineHeight * (pixelSize / 32f));
                     continue;
                 }
                 else if (c == '\r')
                 {
                     penX = 0;
-                    penY -= (int)lineHeight;
+                    penY -= (int)(lineHeight * (pixelSize / 32f));
                     if (i < text.Length - 1 && text[i + 1] == '\n')
                     {
                         i++;
@@ -176,13 +191,16 @@ namespace Fonts
                 penX += glyphAdvance.x;
                 //penY += advance.y / pixelSize;
 
-                vertices[(i * 4) + 0] = new Vector3(first, 0) / FixedPointScale / pixelSize;
-                vertices[(i * 4) + 1] = new Vector3(second, 0) / FixedPointScale / pixelSize;
-                vertices[(i * 4) + 2] = new Vector3(third, 0) / FixedPointScale / pixelSize;
-                vertices[(i * 4) + 3] = new Vector3(fourth, 0) / FixedPointScale / pixelSize;
+                vertices[vertexIndex + 0] = new Vector3(first, 0) / FixedPointScale / pixelSize;
+                vertices[vertexIndex + 1] = new Vector3(second, 0) / FixedPointScale / pixelSize;
+                vertices[vertexIndex + 2] = new Vector3(third, 0) / FixedPointScale / pixelSize;
+                vertices[vertexIndex + 3] = new Vector3(fourth, 0) / FixedPointScale / pixelSize;
+
+                vertexIndex += 4;
             }
 
-            return Vector2.Max(maxPosition, new Vector2(penX, -penY) / FixedPointScale / pixelSize);
+            Vector2 maxPosition = new Vector2(penX, -penY) / FixedPointScale / pixelSize;
+            return (maxPosition, vertexIndex);
         }
 
         private static Vector2 GetGlyphOrigin(int penX, int penY, IsGlyph glyph)
