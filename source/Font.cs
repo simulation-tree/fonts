@@ -13,11 +13,15 @@ namespace Fonts
     /// </summary>
     public readonly struct Font : IFont, IEquatable<Font>
     {
+        public const uint DefaultPixelSize = 16;
+        public const float FixedPointScale = 64f;
+
         private readonly Entity entity;
 
         public readonly FixedString FamilyName => entity.GetComponent<FontName>().familyName;
         public readonly uint LineHeight => entity.GetComponent<FontMetrics>().lineHeight;
         public readonly uint GlyphCount => entity.GetArrayLength<FontGlyph>();
+        public readonly ref uint PixelSize => ref entity.GetComponent<IsFontRequest>().pixelSize;
 
         public readonly Glyph this[uint index]
         {
@@ -47,25 +51,25 @@ namespace Fonts
             entity = new(world, existingEntity);
         }
 
-        public Font(World world, USpan<char> address)
+        public Font(World world, USpan<char> address, uint pixelSize = DefaultPixelSize)
         {
             entity = new(world);
             entity.AddComponent(new IsDataRequest(address));
-            entity.AddComponent(new IsFontRequest());
+            entity.AddComponent(new IsFontRequest(0, pixelSize));
         }
 
-        public Font(World world, FixedString address)
+        public Font(World world, FixedString address, uint pixelSize = DefaultPixelSize)
         {
             entity = new(world);
             entity.AddComponent(new IsDataRequest(address));
-            entity.AddComponent(new IsFontRequest());
+            entity.AddComponent(new IsFontRequest(0, pixelSize));
         }
 
-        public Font(World world, string address)
+        public Font(World world, string address, uint pixelSize = DefaultPixelSize)
         {
             entity = new(world);
             entity.AddComponent(new IsDataRequest(address));
-            entity.AddComponent(new IsFontRequest());
+            entity.AddComponent(new IsFontRequest(0, pixelSize));
         }
 
         public readonly void Dispose()
@@ -92,16 +96,16 @@ namespace Fonts
             return length;
         }
 
-        public readonly Vector2 CalulcateSize(USpan<char> text, uint pixelSize)
+        public readonly Vector2 CalulcateSize(USpan<char> text)
         {
             USpan<Vector3> temp = stackalloc Vector3[(int)(text.Length * 4)];
-            return GenerateVertices(text, temp, pixelSize);
+            return GenerateVertices(text, temp);
         }
 
         /// <summary>
         /// Retrieves the index to the closest character at the given vertex position.
         /// </summary>
-        public readonly bool TryIndexOf(USpan<char> text, uint pixelSize, Vector2 vertexPosition, out uint index)
+        public readonly bool TryIndexOf(USpan<char> text, Vector2 vertexPosition, out uint index)
         {
             if (text.Length == 0)
             {
@@ -110,7 +114,7 @@ namespace Fonts
             }
 
             USpan<Vector3> temp = stackalloc Vector3[(int)(text.Length * 4)];
-            Vector2 maxPosition = GenerateVertices(text, temp, pixelSize);
+            Vector2 maxPosition = GenerateVertices(text, temp);
             float closestDistance = float.MaxValue;
             uint closestIndex = 0;
             for (uint i = 0; i < text.Length; i++)
@@ -128,57 +132,74 @@ namespace Fonts
             return true;
         }
 
-        public readonly Vector2 GenerateVertices(USpan<char> text, USpan<Vector3> vertices, uint pixelSize)
+        public readonly Vector2 GenerateVertices(USpan<char> text, USpan<Vector3> vertices)
         {
             uint lineHeight = LineHeight;
             int penX = 0;
             int penY = 0;
+            uint pixelSize = entity.GetComponent<IsFontRequest>().pixelSize;
             Vector2 maxPosition = default;
             World world = entity.GetWorld();
             USpan<FontGlyph> glyphs = entity.GetArray<FontGlyph>();
             for (uint i = 0; i < text.Length; i++)
             {
                 char c = text[i];
-                rint glyphReference = glyphs[c].value;
-                uint glyphEntity = entity.GetReference(glyphReference);
-                IsGlyph glyph = world.GetComponent<IsGlyph>(glyphEntity);
                 if (c == '\n')
                 {
                     penX = 0;
                     penY -= (int)lineHeight;
                     continue;
                 }
+                else if (c == '\r')
+                {
+                    penX = 0;
+                    penY -= (int)lineHeight;
+                    if (i < text.Length - 1 && text[i + 1] == '\n')
+                    {
+                        i++;
+                    }
 
-                (int x, int y) glyphOffset = glyph.offset;
-                (int x, int y) glyphAdvance = glyph.advance;
-                (int x, int y) glyphSize = glyph.size;
-                (int x, int y) glyphBearing = glyph.bearing;
-                float glyphWidth = glyphSize.x;
-                float glyphHeight = glyphSize.y;
-                Vector2 origin = new(penX + (glyphOffset.x), penY + (glyphOffset.y));
-                origin.Y -= (glyphSize.y - glyphBearing.y);
-                Vector2 size = new(glyphWidth, glyphHeight);
-                origin /= 64f; //why is this divided by 64 again?
-                size /= 64f;
+                    continue;
+                }
+
+                rint glyphReference = glyphs[c].value;
+                uint glyphEntity = entity.GetReference(glyphReference);
+                IsGlyph glyph = world.GetComponent<IsGlyph>(glyphEntity);
+                Vector2 size = GetGlyphSize(glyph);
+                Vector2 origin = GetGlyphOrigin(penX, penY, glyph);
                 Vector2 first = origin;
                 Vector2 second = origin + new Vector2(size.X, 0);
                 Vector2 third = origin + new Vector2(size.X, size.Y);
                 Vector2 fourth = origin + new Vector2(0, size.Y);
+
+                (int x, int y) glyphAdvance = glyph.advance;
                 penX += glyphAdvance.x;
                 //penY += advance.y / pixelSize;
 
-                vertices[(i * 4) + 0] = new Vector3(first, 0) / pixelSize;
-                vertices[(i * 4) + 1] = new Vector3(second, 0) / pixelSize;
-                vertices[(i * 4) + 2] = new Vector3(third, 0) / pixelSize;
-                vertices[(i * 4) + 3] = new Vector3(fourth, 0) / pixelSize;
-
-                maxPosition = Vector2.Max(maxPosition, first);
-                maxPosition = Vector2.Max(maxPosition, second);
-                maxPosition = Vector2.Max(maxPosition, third);
-                maxPosition = Vector2.Max(maxPosition, fourth);
+                vertices[(i * 4) + 0] = new Vector3(first, 0) / FixedPointScale / pixelSize;
+                vertices[(i * 4) + 1] = new Vector3(second, 0) / FixedPointScale / pixelSize;
+                vertices[(i * 4) + 2] = new Vector3(third, 0) / FixedPointScale / pixelSize;
+                vertices[(i * 4) + 3] = new Vector3(fourth, 0) / FixedPointScale / pixelSize;
             }
 
-            return maxPosition;
+            return Vector2.Max(maxPosition, new Vector2(penX, -penY) / FixedPointScale / pixelSize);
+        }
+
+        private static Vector2 GetGlyphOrigin(int penX, int penY, IsGlyph glyph)
+        {
+            (int x, int y) glyphOffset = glyph.offset;
+            (int x, int y) glyphSize = glyph.size;
+            (int x, int y) glyphBearing = glyph.bearing;
+            Vector2 origin = new(penX, penY);
+            origin += new Vector2(glyphOffset.x, glyphOffset.y);
+            origin.Y -= glyphSize.y - glyphBearing.y;
+            return origin;
+        }
+
+        private static Vector2 GetGlyphSize(IsGlyph glyph)
+        {
+            (int x, int y) glyphSize = glyph.size;
+            return new Vector2(glyphSize.x, glyphSize.y);
         }
 
         public readonly override bool Equals(object? obj)
