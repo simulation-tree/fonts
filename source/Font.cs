@@ -13,7 +13,7 @@ namespace Fonts
     /// </summary>
     public readonly struct Font : IFont, IEquatable<Font>
     {
-        public const uint DefaultPixelSize = 16;
+        public const uint DefaultPixelSize = 32;
         public const float FixedPointScale = 64f;
 
         private readonly Entity entity;
