@@ -36,7 +36,11 @@ namespace Fonts
 
         readonly World IEntity.World => entity.world;
         readonly uint IEntity.Value => entity.value;
-        readonly Definition IEntity.Definition => new Definition().AddComponentType<IsFont>().AddArrayType<FontGlyph>();
+
+        readonly Definition IEntity.GetDefinition(Schema schema)
+        {
+            return new Definition().AddComponentType<IsFont>(schema).AddArrayType<FontGlyph>(schema);
+        }
 
 #if NET
         [Obsolete("Default constructor not available", true)]

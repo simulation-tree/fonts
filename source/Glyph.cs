@@ -72,7 +72,11 @@ namespace Fonts
 
         readonly uint IEntity.Value => entity.GetEntityValue();
         readonly World IEntity.World => entity.GetWorld();
-        readonly Definition IEntity.Definition => new Definition().AddComponentType<IsGlyph>().AddArrayType<Kerning>();
+
+        readonly Definition IEntity.GetDefinition(Schema schema)
+        {
+            return new Definition().AddComponentType<IsGlyph>(schema).AddArrayType<Kerning>(schema);
+        }
 
         public Glyph(World world, uint existingEntity)
         {
