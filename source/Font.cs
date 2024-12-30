@@ -39,7 +39,7 @@ namespace Fonts
 
         readonly Definition IEntity.GetDefinition(Schema schema)
         {
-            return new Definition().AddComponentType<IsFont>(schema).AddArrayType<FontGlyph>(schema);
+            return new Definition().AddComponentType<IsFont>(schema).AddArrayElementType<FontGlyph>(schema);
         }
 
 #if NET

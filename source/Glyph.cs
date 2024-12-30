@@ -75,7 +75,7 @@ namespace Fonts
 
         readonly Definition IEntity.GetDefinition(Schema schema)
         {
-            return new Definition().AddComponentType<IsGlyph>(schema).AddArrayType<Kerning>(schema);
+            return new Definition().AddComponentType<IsGlyph>(schema).AddArrayElementType<Kerning>(schema);
         }
 
         public Glyph(World world, uint existingEntity)

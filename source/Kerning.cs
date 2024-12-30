@@ -4,7 +4,7 @@ using Worlds;
 
 namespace Fonts
 {
-    [Array]
+    [ArrayElement]
     public readonly struct Kerning
     {
         public readonly char nextCharacter;
