@@ -1,4 +1,5 @@
-﻿using Data.Components;
+﻿using Data;
+using Data.Components;
 using Fonts.Components;
 using System;
 using System.Numerics;
@@ -55,25 +56,9 @@ namespace Fonts
             entity = new(world, existingEntity);
         }
 
-        public Font(World world, USpan<char> address, uint pixelSize = DefaultPixelSize)
+        public Font(World world, Address address, uint pixelSize = DefaultPixelSize)
         {
-            entity = new(world);
-            entity.AddComponent(new IsDataRequest(address));
-            entity.AddComponent(new IsFontRequest(0, pixelSize));
-        }
-
-        public Font(World world, FixedString address, uint pixelSize = DefaultPixelSize)
-        {
-            entity = new(world);
-            entity.AddComponent(new IsDataRequest(address));
-            entity.AddComponent(new IsFontRequest(0, pixelSize));
-        }
-
-        public Font(World world, string address, uint pixelSize = DefaultPixelSize)
-        {
-            entity = new(world);
-            entity.AddComponent(new IsDataRequest(address));
-            entity.AddComponent(new IsFontRequest(0, pixelSize));
+            entity = new Entity<IsDataRequest, IsFontRequest>(world, new(address), new(0, pixelSize));
         }
 
         public readonly void Dispose()
