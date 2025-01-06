@@ -38,9 +38,10 @@ namespace Fonts
         readonly World IEntity.World => entity.world;
         readonly uint IEntity.Value => entity.value;
 
-        readonly Definition IEntity.GetDefinition(Schema schema)
+        readonly void IEntity.Describe(ref Archetype archetype)
         {
-            return new Definition().AddComponentType<IsFont>(schema).AddArrayElementType<FontGlyph>(schema);
+            archetype.AddComponentType<IsFont>();
+            archetype.AddArrayElementType<FontGlyph>();
         }
 
 #if NET
