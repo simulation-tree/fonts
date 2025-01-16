@@ -2,6 +2,7 @@
 using Data.Components;
 using Fonts.Components;
 using System;
+using System.Diagnostics;
 using System.Numerics;
 using Unmanaged;
 using Worlds;
@@ -167,7 +168,17 @@ namespace Fonts
                     continue;
                 }
 
-                rint glyphReference = glyphs[c].value;
+                rint glyphReference;
+                if (c < glyphs.Length)
+                {
+                    glyphReference = glyphs[c].value;
+                }
+                else
+                {
+                    glyphReference = glyphs['?'].value;
+                    Trace.WriteLine($"Character `{c}` (`{(uint)c}`) is missing from font `{FamilyName}`");
+                }
+
                 uint glyphEntity = entity.GetReference(glyphReference);
                 IsGlyph glyph = world.GetComponent<IsGlyph>(glyphEntity);
                 Vector2 size = GetGlyphSize(glyph);
