@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using Unmanaged;
 using Worlds;
 
@@ -26,9 +27,11 @@ namespace Fonts
         public readonly uint ToString(USpan<char> buffer)
         {
             uint length = 0;
-            length += "Character: ".AsUSpan().CopyTo(buffer);
+            USpan<char> template = "Character: ".AsSpan();
+            length += template.CopyTo(buffer);
             buffer[length++] = nextCharacter;
-            length += ", Amount: ".AsUSpan().CopyTo(buffer.Slice(length));
+            template = ", Amount: ".AsSpan();
+            length += template.CopyTo(buffer.Slice(length));
             length += amount.ToString(buffer.Slice(length));
             return length;
         }
