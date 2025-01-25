@@ -7,6 +7,10 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<IsAotCompatible>True</IsAotCompatible>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+		<Title>Fonts</Title>
+		<Authors>popcron</Authors>
+		<Company>game-simulations</Company>
+		<RepositoryUrl>https://github.com/game-simulations/fonts</RepositoryUrl>
 	</PropertyGroup>
 
 	<ItemGroup>

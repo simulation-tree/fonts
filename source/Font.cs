@@ -53,14 +53,26 @@ namespace Fonts
         }
 #endif
 
-        public Font(World world, uint existingEntity)
-        {
-            entity = new(world, existingEntity);
-        }
-
+        /// <summary>
+        /// Creates a request for a font.
+        /// </summary>
         public Font(World world, Address address, uint pixelSize = DefaultPixelSize)
         {
             entity = new Entity<IsDataRequest, IsFontRequest>(world, new(address), new(0, pixelSize));
+        }
+
+        /// <summary>
+        /// Creates an empty font.
+        /// </summary>
+        public Font(World world, USpan<Glyph> glyphs)
+        {
+            entity = new Entity<IsFont>(world);
+            USpan<FontGlyph> fontGlyphs = entity.CreateArray<FontGlyph>(glyphs.Length);
+            for (uint i = 0; i < glyphs.Length; i++)
+            {
+                Glyph glyph = glyphs[i];
+                fontGlyphs[i] = new FontGlyph(entity.AddReference(glyphs[i]));
+            }
         }
 
         public readonly void Dispose()
