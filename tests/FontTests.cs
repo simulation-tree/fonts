@@ -8,13 +8,13 @@ namespace Fonts.Tests
     {
         static FontTests()
         {
-            TypeRegistry.Load<Fonts.TypeBank>();
+            TypeRegistry.Load<FontsTypeBank>();
         }
 
         protected override Schema CreateSchema()
         {
             Schema schema = base.CreateSchema();
-            schema.Load<Fonts.SchemaBank>();
+            schema.Load<FontsSchemaBank>();
             return schema;
         }
     }
