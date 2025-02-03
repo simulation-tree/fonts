@@ -1,6 +1,4 @@
-﻿using Data;
-using Data.Components;
-using Fonts.Components;
+﻿using Fonts.Components;
 using System;
 using System.Diagnostics;
 using System.Numerics;
@@ -13,71 +11,68 @@ namespace Fonts
     /// Contains a list of <see cref="Glyph"/> entities sorted by
     /// their unicode character.
     /// </summary>
-    public readonly struct Font : IFont, IEquatable<Font>
+    public readonly partial struct Font : IEntity
     {
         public const uint DefaultPixelSize = 32;
         public const float FixedPointScale = 64f;
 
-        private readonly Entity entity;
+        public readonly bool IsLoaded
+        {
+            get
+            {
+                if (TryGetComponent(out IsFontRequest request))
+                {
+                    return request.status == IsFontRequest.Status.Loaded;
+                }
 
-        public readonly FixedString FamilyName => entity.GetComponent<FontName>().familyName;
-        public readonly uint LineHeight => entity.GetComponent<FontMetrics>().lineHeight;
-        public readonly uint GlyphCount => entity.GetArrayLength<FontGlyph>();
-        public readonly ref uint PixelSize => ref entity.GetComponent<IsFontRequest>().pixelSize;
+                return IsCompliant;
+            }
+        }
+
+        public readonly FixedString FamilyName => GetComponent<FontName>().familyName;
+        public readonly uint LineHeight => GetComponent<FontMetrics>().lineHeight;
+        public readonly uint GlyphCount => GetArrayLength<FontGlyph>();
+        public readonly uint PixelSize => GetComponent<IsFont>().pixelSize;
 
         public readonly Glyph this[uint index]
         {
             get
             {
-                FontGlyph glyph = entity.GetArrayElement<FontGlyph>(index);
+                FontGlyph glyph = GetArrayElement<FontGlyph>(index);
                 rint glyphReference = glyph.value;
-                uint glyphEntity = entity.GetReference(glyphReference);
-                return new(entity.world, glyphEntity);
+                uint glyphEntity = GetReference(glyphReference);
+                return new Entity(world, glyphEntity).As<Glyph>();
             }
-        }
-
-        readonly World IEntity.World => entity.world;
-        readonly uint IEntity.Value => entity.value;
-
-        readonly void IEntity.Describe(ref Archetype archetype)
-        {
-            archetype.AddComponentType<IsFont>();
-            archetype.AddArrayElementType<FontGlyph>();
-        }
-
-#if NET
-        [Obsolete("Default constructor not available", true)]
-        public Font()
-        {
-            throw new NotImplementedException();
-        }
-#endif
-
-        /// <summary>
-        /// Creates a request for a font.
-        /// </summary>
-        public Font(World world, Address address, uint pixelSize = DefaultPixelSize)
-        {
-            entity = new Entity<IsDataRequest, IsFontRequest>(world, new(address), new(0, pixelSize));
         }
 
         /// <summary>
         /// Creates an empty font.
         /// </summary>
-        public Font(World world, USpan<Glyph> glyphs)
+        public Font(World world, USpan<Glyph> glyphs, uint pixelSize = DefaultPixelSize)
         {
-            entity = new Entity<IsFont>(world);
-            USpan<FontGlyph> fontGlyphs = entity.CreateArray<FontGlyph>(glyphs.Length);
+            this.world = world;
+            value = world.CreateEntity(new IsFont(0, pixelSize));
+            USpan<FontGlyph> fontGlyphs = CreateArray<FontGlyph>(glyphs.Length);
             for (uint i = 0; i < glyphs.Length; i++)
             {
                 Glyph glyph = glyphs[i];
-                fontGlyphs[i] = new FontGlyph(entity.AddReference(glyphs[i]));
+                fontGlyphs[i] = new FontGlyph(AddReference(glyph));
             }
         }
 
-        public readonly void Dispose()
+        /// <summary>
+        /// Creates a request for a font from the given <paramref name="address"/>.
+        /// </summary>
+        public Font(World world, FixedString address, uint pixelSize = DefaultPixelSize, TimeSpan timeout = default)
         {
-            entity.Dispose();
+            this.world = world;
+            value = world.CreateEntity(new IsFontRequest(pixelSize, address, timeout));
+        }
+
+        readonly void IEntity.Describe(ref Archetype archetype)
+        {
+            archetype.AddComponentType<IsFont>();
+            archetype.AddArrayType<FontGlyph>();
         }
 
         public unsafe readonly override string ToString()
@@ -93,7 +88,7 @@ namespace Fonts
             buffer[length++] = ' ';
             buffer[length++] = '(';
             buffer[length++] = '`';
-            length += entity.ToString(buffer.Slice(length));
+            length += value.ToString(buffer.Slice(length));
             buffer[length++] = '`';
             buffer[length++] = ')';
             return length;
@@ -153,25 +148,23 @@ namespace Fonts
         public readonly (Vector2 maxPosition, uint vertexCount) GenerateVertices(USpan<char> text, USpan<Vector3> vertices)
         {
             uint lineHeight = LineHeight;
-            int penX = 0;
-            int penY = 0;
-            uint pixelSize = entity.GetComponent<IsFontRequest>().pixelSize;
-            World world = entity.GetWorld();
-            USpan<FontGlyph> glyphs = entity.GetArray<FontGlyph>();
+            Vector2 cursor = default;
+            uint pixelSize = GetComponent<IsFontRequest>().pixelSize;
+            USpan<FontGlyph> glyphs = GetArray<FontGlyph>();
             uint vertexIndex = 0;
             for (uint i = 0; i < text.Length; i++)
             {
                 char c = text[i];
                 if (c == '\n')
                 {
-                    penX = 0;
-                    penY -= (int)(lineHeight * (pixelSize / 32f));
+                    cursor.X = 0;
+                    cursor.Y -= (int)(lineHeight * (pixelSize / 32f));
                     continue;
                 }
                 else if (c == '\r')
                 {
-                    penX = 0;
-                    penY -= (int)(lineHeight * (pixelSize / 32f));
+                    cursor.X = 0;
+                    cursor.Y -= (int)(lineHeight * (pixelSize / 32f));
                     if (i < text.Length - 1 && text[i + 1] == '\n')
                     {
                         i++;
@@ -191,17 +184,17 @@ namespace Fonts
                     Trace.WriteLine($"Character `{c}` (`{(uint)c}`) is missing from font `{FamilyName}`");
                 }
 
-                uint glyphEntity = entity.GetReference(glyphReference);
+                uint glyphEntity = GetReference(glyphReference);
                 IsGlyph glyph = world.GetComponent<IsGlyph>(glyphEntity);
-                Vector2 size = GetGlyphSize(glyph);
-                Vector2 origin = GetGlyphOrigin(penX, penY, glyph);
+                Vector2 size = glyph.Size;
+                Vector2 origin = GetGlyphOrigin(cursor, glyph);
                 Vector2 first = origin;
                 Vector2 second = origin + new Vector2(size.X, 0);
                 Vector2 third = origin + new Vector2(size.X, size.Y);
                 Vector2 fourth = origin + new Vector2(0, size.Y);
 
-                (int x, int y) glyphAdvance = glyph.advance;
-                penX += glyphAdvance.x;
+                Vector2 glyphAdvance = glyph.Advance;
+                cursor.X += glyphAdvance.X;
                 //penY += advance.y / pixelSize;
 
                 vertices[vertexIndex + 0] = new Vector3(first, 0) / FixedPointScale / pixelSize;
@@ -212,55 +205,19 @@ namespace Fonts
                 vertexIndex += 4;
             }
 
-            Vector2 maxPosition = new Vector2(penX, -penY) / FixedPointScale / pixelSize;
+            Vector2 maxPosition = new Vector2(cursor.X, -cursor.Y) / FixedPointScale / pixelSize;
             return (maxPosition, vertexIndex);
         }
 
-        private static Vector2 GetGlyphOrigin(int penX, int penY, IsGlyph glyph)
+        private static Vector2 GetGlyphOrigin(Vector2 cursor, IsGlyph glyph)
         {
-            (int x, int y) glyphOffset = glyph.offset;
-            (int x, int y) glyphSize = glyph.size;
-            (int x, int y) glyphBearing = glyph.bearing;
-            Vector2 origin = new(penX, penY);
-            origin += new Vector2(glyphOffset.x, glyphOffset.y);
-            origin.Y -= glyphSize.y - glyphBearing.y;
+            Vector2 glyphOffset = glyph.Offset;
+            Vector2 glyphSize = glyph.Size;
+            Vector2 glyphBearing = glyph.Bearing;
+            Vector2 origin = cursor;
+            origin += glyphOffset;
+            origin.Y -= glyphSize.Y - glyphBearing.Y;
             return origin;
-        }
-
-        private static Vector2 GetGlyphSize(IsGlyph glyph)
-        {
-            (int x, int y) glyphSize = glyph.size;
-            return new Vector2(glyphSize.x, glyphSize.y);
-        }
-
-        public readonly override bool Equals(object? obj)
-        {
-            return obj is Font font && Equals(font);
-        }
-
-        public readonly bool Equals(Font other)
-        {
-            return entity.Equals(other.entity);
-        }
-
-        public readonly override int GetHashCode()
-        {
-            return HashCode.Combine(entity);
-        }
-
-        public static bool operator ==(Font left, Font right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(Font left, Font right)
-        {
-            return !(left == right);
-        }
-
-        public static implicit operator Entity(Font font)
-        {
-            return font.entity;
         }
     }
 }

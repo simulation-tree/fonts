@@ -1,4 +1,5 @@
-﻿using Worlds;
+﻿using System.Numerics;
+using Worlds;
 
 namespace Fonts.Components
 {
@@ -10,6 +11,11 @@ namespace Fonts.Components
         public readonly (int x, int y) bearing;
         public readonly (int x, int y) offset;
         public readonly (int x, int y) size;
+
+        public readonly Vector2 Advance => new(advance.x, advance.y);
+        public readonly Vector2 Bearing => new(bearing.x, bearing.y);
+        public readonly Vector2 Offset => new(offset.x, offset.y);
+        public readonly Vector2 Size => new(size.x, size.y);
 
         public IsGlyph(char character, (int x, int y) advance, (int x, int y) bearing, (int x, int y) offset, (int x, int y) size)
         {

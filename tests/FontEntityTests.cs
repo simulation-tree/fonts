@@ -9,7 +9,7 @@ namespace Fonts.Tests
         {
             using World world = CreateWorld();
             Font font = new(world, []);
-            Assert.That(font.Is(), Is.True);
+            Assert.That(font.IsCompliant, Is.True);
         }
     }
 }
