@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using Unmanaged;
 using Worlds;
 
@@ -94,6 +95,7 @@ namespace Fonts
             return length;
         }
 
+        [SkipLocalsInit]
         public readonly Vector2 CalulcateSize(USpan<char> text)
         {
             USpan<Vector3> temp = stackalloc Vector3[(int)(text.Length * 4)];
@@ -103,6 +105,7 @@ namespace Fonts
         /// <summary>
         /// Retrieves the index to the closest character at the given vertex position.
         /// </summary>
+        [SkipLocalsInit]
         public readonly bool TryIndexOf(USpan<char> text, Vector2 vertexPosition, out uint index)
         {
             if (text.Length == 0)
