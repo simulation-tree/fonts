@@ -2,7 +2,6 @@
 
 namespace Fonts.Components
 {
-    [ArrayElement]
     public readonly struct FontGlyph
     {
         public readonly rint value;

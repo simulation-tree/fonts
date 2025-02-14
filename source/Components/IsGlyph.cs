@@ -1,9 +1,7 @@
 ﻿using System.Numerics;
-using Worlds;
 
 namespace Fonts.Components
 {
-    [Component]
     public readonly struct IsGlyph
     {
         public readonly char character;

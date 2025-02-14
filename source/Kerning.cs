@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Numerics;
 using Unmanaged;
-using Worlds;
 
 namespace Fonts
 {
-    [ArrayElement]
     public readonly struct Kerning
     {
         public readonly char nextCharacter;

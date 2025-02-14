@@ -1,10 +1,8 @@
 ﻿using System;
 using Unmanaged;
-using Worlds;
 
 namespace Fonts.Components
 {
-    [Component]
     public struct IsFontRequest
     {
         public uint pixelSize;
