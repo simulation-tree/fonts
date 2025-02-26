@@ -1,4 +1,5 @@
-﻿using Fonts.Components;
+﻿using Collections.Generic;
+using Fonts.Components;
 using System;
 using System.Numerics;
 using Unmanaged;
@@ -31,7 +32,7 @@ namespace Fonts
         /// </summary>
         public readonly (int x, int y) Size => GetComponent<IsGlyph>().size;
 
-        public readonly USpan<Kerning> Kernings => GetArray<Kerning>();
+        public readonly USpan<Kerning> Kernings => GetArray<Kerning>().AsSpan();
 
         public Glyph(World world, char character, (int x, int y) advance, (int x, int y) bearing, (int x, int y) offset, (int x, int y) size, USpan<Kerning> kernings)
         {
@@ -55,7 +56,7 @@ namespace Fonts
 
         public readonly Vector2 GetKerning(char nextCharacter)
         {
-            USpan<Kerning> kernings = GetArray<Kerning>();
+            Array<Kerning> kernings = GetArray<Kerning>();
             foreach (Kerning kerning in kernings)
             {
                 if (kerning.nextCharacter == nextCharacter)
@@ -69,7 +70,7 @@ namespace Fonts
 
         public readonly bool ContainsKerning(char nextCharacter)
         {
-            USpan<Kerning> kernings = GetArray<Kerning>();
+            Array<Kerning> kernings = GetArray<Kerning>();
             foreach (Kerning kerning in kernings)
             {
                 if (kerning.nextCharacter == nextCharacter)
@@ -83,8 +84,9 @@ namespace Fonts
 
         public readonly void AddKerning(char nextCharacter, Vector2 amount)
         {
-            USpan<Kerning> kernings = GetArray<Kerning>();
-            for (uint i = 0; i < kernings.Length; i++)
+            Array<Kerning> kernings = GetArray<Kerning>();
+            uint count = kernings.Length;
+            for (uint i = 0; i < count; i++)
             {
                 if (kernings[i].nextCharacter == nextCharacter)
                 {
@@ -92,13 +94,14 @@ namespace Fonts
                 }
             }
 
-            kernings = ResizeArray<Kerning>(kernings.Length + 1);
-            kernings[kernings.Length - 1] = new(nextCharacter, amount);
+            kernings.Length++;
+            kernings[count] = new(nextCharacter, amount);
         }
 
         public readonly void ClearKernings()
         {
-            ResizeArray<Kerning>(0);
+            Array<Kerning> kernings = GetArray<Kerning>();
+            kernings.Length = 0;
         }
     }
 }
