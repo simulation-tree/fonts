@@ -24,12 +24,13 @@ namespace Fonts
 
         public readonly uint ToString(USpan<char> buffer)
         {
-            uint length = 0;
             USpan<char> template = "Character: ".AsSpan();
-            length += template.CopyTo(buffer);
+            template.CopyTo(buffer);
+            uint length = template.Length;
             buffer[length++] = nextCharacter;
             template = ", Amount: ".AsSpan();
-            length += template.CopyTo(buffer.Slice(length));
+            template.CopyTo(buffer.Slice(length));
+            length += template.Length;
             length += amount.ToString(buffer.Slice(length));
             return length;
         }
