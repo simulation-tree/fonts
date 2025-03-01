@@ -1,5 +1,4 @@
-﻿using Collections.Generic;
-using Fonts.Components;
+﻿using Fonts.Components;
 using System;
 using System.Diagnostics;
 using System.Numerics;
@@ -54,7 +53,7 @@ namespace Fonts
         {
             this.world = world;
             value = world.CreateEntity(new IsFont(0, pixelSize));
-            Array<FontGlyph> fontGlyphs = CreateArray<FontGlyph>(glyphs.Length);
+            Values<FontGlyph> fontGlyphs = CreateArray<FontGlyph>(glyphs.Length);
             for (uint i = 0; i < glyphs.Length; i++)
             {
                 Glyph glyph = glyphs[i];
@@ -81,7 +80,7 @@ namespace Fonts
         {
             USpan<char> buffer = stackalloc char[256];
             uint length = ToString(buffer);
-            return buffer.Slice(0, length).ToString();
+            return buffer.GetSpan(length).ToString();
         }
 
         public readonly uint ToString(USpan<char> buffer)
@@ -154,7 +153,7 @@ namespace Fonts
             uint lineHeight = LineHeight;
             Vector2 cursor = default;
             uint pixelSize = GetComponent<IsFontRequest>().pixelSize;
-            Array<FontGlyph> glyphs = GetArray<FontGlyph>();
+            Values<FontGlyph> glyphs = GetArray<FontGlyph>();
             uint vertexIndex = 0;
             for (uint i = 0; i < text.Length; i++)
             {

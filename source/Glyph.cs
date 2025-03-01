@@ -1,5 +1,4 @@
-﻿using Collections.Generic;
-using Fonts.Components;
+﻿using Fonts.Components;
 using System;
 using System.Numerics;
 using Unmanaged;
@@ -56,7 +55,7 @@ namespace Fonts
 
         public readonly Vector2 GetKerning(char nextCharacter)
         {
-            Array<Kerning> kernings = GetArray<Kerning>();
+            Values<Kerning> kernings = GetArray<Kerning>();
             foreach (Kerning kerning in kernings)
             {
                 if (kerning.nextCharacter == nextCharacter)
@@ -70,7 +69,7 @@ namespace Fonts
 
         public readonly bool ContainsKerning(char nextCharacter)
         {
-            Array<Kerning> kernings = GetArray<Kerning>();
+            Values<Kerning> kernings = GetArray<Kerning>();
             foreach (Kerning kerning in kernings)
             {
                 if (kerning.nextCharacter == nextCharacter)
@@ -84,7 +83,7 @@ namespace Fonts
 
         public readonly void AddKerning(char nextCharacter, Vector2 amount)
         {
-            Array<Kerning> kernings = GetArray<Kerning>();
+            Values<Kerning> kernings = GetArray<Kerning>();
             uint count = kernings.Length;
             for (uint i = 0; i < count; i++)
             {
@@ -100,7 +99,7 @@ namespace Fonts
 
         public readonly void ClearKernings()
         {
-            Array<Kerning> kernings = GetArray<Kerning>();
+            Values<Kerning> kernings = GetArray<Kerning>();
             kernings.Length = 0;
         }
     }
