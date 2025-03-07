@@ -30,7 +30,7 @@ namespace Fonts
             }
         }
 
-        public readonly FixedString FamilyName => GetComponent<FontName>().familyName;
+        public readonly ASCIIText256 FamilyName => GetComponent<FontName>().familyName;
         public readonly uint LineHeight => GetComponent<FontMetrics>().lineHeight;
         public readonly uint GlyphCount => GetArrayLength<FontGlyph>();
         public readonly uint PixelSize => GetComponent<IsFont>().pixelSize;
@@ -64,7 +64,7 @@ namespace Fonts
         /// <summary>
         /// Creates a request for a font from the given <paramref name="address"/>.
         /// </summary>
-        public Font(World world, FixedString address, uint pixelSize = DefaultPixelSize, TimeSpan timeout = default)
+        public Font(World world, ASCIIText256 address, uint pixelSize = DefaultPixelSize, TimeSpan timeout = default)
         {
             this.world = world;
             value = world.CreateEntity(new IsFontRequest(pixelSize, address, timeout));

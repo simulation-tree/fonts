@@ -4,14 +4,14 @@ namespace Fonts.Components
 {
     public readonly struct FontName
     {
-        public readonly FixedString familyName;
+        public readonly ASCIIText256 familyName;
 
         public FontName(USpan<char> familyName)
         {
             this.familyName = new(familyName);
         }
 
-        public FontName(FixedString familyName)
+        public FontName(ASCIIText256 familyName)
         {
             this.familyName = familyName;
         }

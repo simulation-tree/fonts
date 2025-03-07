@@ -6,12 +6,12 @@ namespace Fonts.Components
     public struct IsFontRequest
     {
         public uint pixelSize;
-        public FixedString address;
+        public ASCIIText256 address;
         public TimeSpan timeout;
         public TimeSpan duration;
         public Status status;
 
-        public IsFontRequest(uint pixelSize, FixedString address, TimeSpan timeout)
+        public IsFontRequest(uint pixelSize, ASCIIText256 address, TimeSpan timeout)
         {
             this.pixelSize = pixelSize;
             this.address = address;
