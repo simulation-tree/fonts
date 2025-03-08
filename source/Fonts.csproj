@@ -9,8 +9,8 @@
         <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
         <Title>Fonts</Title>
         <Authors>popcron</Authors>
-        <Company>game-simulations</Company>
-        <RepositoryUrl>https://github.com/game-simulations/fonts</RepositoryUrl>
+        <Company>simulation-tree</Company>
+        <RepositoryUrl>https://github.com/simulation-tree/fonts</RepositoryUrl>
         <PackageId/>
     </PropertyGroup>
 
