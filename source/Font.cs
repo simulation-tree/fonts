@@ -32,10 +32,10 @@ namespace Fonts
 
         public readonly ASCIIText256 FamilyName => GetComponent<FontName>().familyName;
         public readonly uint LineHeight => GetComponent<FontMetrics>().lineHeight;
-        public readonly uint GlyphCount => GetArrayLength<FontGlyph>();
+        public readonly int GlyphCount => GetArrayLength<FontGlyph>();
         public readonly uint PixelSize => GetComponent<IsFont>().pixelSize;
 
-        public readonly Glyph this[uint index]
+        public readonly Glyph this[int index]
         {
             get
             {
@@ -49,12 +49,12 @@ namespace Fonts
         /// <summary>
         /// Creates an empty font.
         /// </summary>
-        public Font(World world, USpan<Glyph> glyphs, uint pixelSize = DefaultPixelSize)
+        public Font(World world, ReadOnlySpan<Glyph> glyphs, uint pixelSize = DefaultPixelSize)
         {
             this.world = world;
             value = world.CreateEntity(new IsFont(0, pixelSize));
             Values<FontGlyph> fontGlyphs = CreateArray<FontGlyph>(glyphs.Length);
-            for (uint i = 0; i < glyphs.Length; i++)
+            for (int i = 0; i < glyphs.Length; i++)
             {
                 Glyph glyph = glyphs[i];
                 fontGlyphs[i] = new FontGlyph(AddReference(glyph));
@@ -78,27 +78,27 @@ namespace Fonts
 
         public unsafe readonly override string ToString()
         {
-            USpan<char> buffer = stackalloc char[256];
-            uint length = ToString(buffer);
-            return buffer.GetSpan(length).ToString();
+            Span<char> buffer = stackalloc char[256];
+            int length = ToString(buffer);
+            return buffer.Slice(0, length).ToString();
         }
 
-        public readonly uint ToString(USpan<char> buffer)
+        public readonly int ToString(Span<char> destination)
         {
-            uint length = FamilyName.CopyTo(buffer);
-            buffer[length++] = ' ';
-            buffer[length++] = '(';
-            buffer[length++] = '`';
-            length += value.ToString(buffer.Slice(length));
-            buffer[length++] = '`';
-            buffer[length++] = ')';
+            int length = FamilyName.CopyTo(destination);
+            destination[length++] = ' ';
+            destination[length++] = '(';
+            destination[length++] = '`';
+            length += value.ToString(destination.Slice(length));
+            destination[length++] = '`';
+            destination[length++] = ')';
             return length;
         }
 
         [SkipLocalsInit]
-        public readonly Vector2 CalulcateSize(USpan<char> text)
+        public readonly Vector2 CalulcateSize(ReadOnlySpan<char> text)
         {
-            USpan<Vector3> temp = stackalloc Vector3[(int)(text.Length * 4)];
+            Span<Vector3> temp = stackalloc Vector3[text.Length * 4];
             return GenerateVertices(text, temp).maxPosition;
         }
 
@@ -106,7 +106,7 @@ namespace Fonts
         /// Retrieves the index to the closest character at the given vertex position.
         /// </summary>
         [SkipLocalsInit]
-        public readonly bool TryIndexOf(USpan<char> text, Vector2 vertexPosition, out uint index)
+        public readonly bool TryIndexOf(ReadOnlySpan<char> text, Vector2 vertexPosition, out int index)
         {
             if (text.Length == 0)
             {
@@ -114,11 +114,11 @@ namespace Fonts
                 return false;
             }
 
-            USpan<Vector3> temp = stackalloc Vector3[(int)(text.Length * 4)];
-            (Vector2 maxPosition, uint vertexCount) = GenerateVertices(text, temp);
+            Span<Vector3> temp = stackalloc Vector3[text.Length * 4];
+            (Vector2 maxPosition, int vertexCount) = GenerateVertices(text, temp);
             float closestDistance = float.MaxValue;
-            uint closestIndex = 0;
-            for (uint i = 0; i < text.Length; i++)
+            int closestIndex = 0;
+            for (int i = 0; i < text.Length; i++)
             {
                 char c = text[i];
                 if (c == '\n')
@@ -148,14 +148,14 @@ namespace Fonts
             return true;
         }
 
-        public readonly (Vector2 maxPosition, uint vertexCount) GenerateVertices(USpan<char> text, USpan<Vector3> vertices)
+        public readonly (Vector2 maxPosition, int vertexCount) GenerateVertices(ReadOnlySpan<char> text, Span<Vector3> vertices)
         {
             uint lineHeight = LineHeight;
             Vector2 cursor = default;
             uint pixelSize = GetComponent<IsFontRequest>().pixelSize;
             Values<FontGlyph> glyphs = GetArray<FontGlyph>();
-            uint vertexIndex = 0;
-            for (uint i = 0; i < text.Length; i++)
+            int vertexIndex = 0;
+            for (int i = 0; i < text.Length; i++)
             {
                 char c = text[i];
                 if (c == '\n')

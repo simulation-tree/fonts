@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using Unmanaged;
 
 namespace Fonts
 {
@@ -17,21 +16,21 @@ namespace Fonts
 
         public readonly override string ToString()
         {
-            USpan<char> buffer = stackalloc char[128];
-            uint length = ToString(buffer);
-            return buffer.GetSpan(length).ToString();
+            Span<char> buffer = stackalloc char[128];
+            int length = ToString(buffer);
+            return buffer.Slice(0, length).ToString();
         }
 
-        public readonly uint ToString(USpan<char> buffer)
+        public readonly int ToString(Span<char> destination)
         {
-            USpan<char> template = "Character: ".AsSpan();
-            template.CopyTo(buffer);
-            uint length = template.Length;
-            buffer[length++] = nextCharacter;
+            ReadOnlySpan<char> template = "Character: ";
+            template.CopyTo(destination);
+            int length = template.Length;
+            destination[length++] = nextCharacter;
             template = ", Amount: ".AsSpan();
-            template.CopyTo(buffer.Slice(length));
+            template.CopyTo(destination.Slice(length));
             length += template.Length;
-            length += amount.ToString(buffer.Slice(length));
+            length += amount.ToString(destination.Slice(length));
             return length;
         }
     }

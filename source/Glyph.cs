@@ -1,7 +1,6 @@
 ﻿using Fonts.Components;
 using System;
 using System.Numerics;
-using Unmanaged;
 using Worlds;
 
 namespace Fonts
@@ -31,9 +30,9 @@ namespace Fonts
         /// </summary>
         public readonly (int x, int y) Size => GetComponent<IsGlyph>().size;
 
-        public readonly USpan<Kerning> Kernings => GetArray<Kerning>().AsSpan();
+        public readonly ReadOnlySpan<Kerning> Kernings => GetArray<Kerning>().AsSpan();
 
-        public Glyph(World world, char character, (int x, int y) advance, (int x, int y) bearing, (int x, int y) offset, (int x, int y) size, USpan<Kerning> kernings)
+        public Glyph(World world, char character, (int x, int y) advance, (int x, int y) bearing, (int x, int y) offset, (int x, int y) size, ReadOnlySpan<Kerning> kernings)
         {
             this.world = world;
             value = world.CreateEntity(new IsGlyph(character, advance, bearing, offset, size));
@@ -49,7 +48,7 @@ namespace Fonts
         public unsafe readonly override string ToString()
         {
             char character = Character;
-            USpan<char> buffer = ['\'', character, '\''];
+            System.Span<char> buffer = ['\'', character, '\''];
             return buffer.ToString();
         }
 
@@ -84,8 +83,8 @@ namespace Fonts
         public readonly void AddKerning(char nextCharacter, Vector2 amount)
         {
             Values<Kerning> kernings = GetArray<Kerning>();
-            uint count = kernings.Length;
-            for (uint i = 0; i < count; i++)
+            int count = kernings.Length;
+            for (int i = 0; i < count; i++)
             {
                 if (kernings[i].nextCharacter == nextCharacter)
                 {

@@ -1,4 +1,5 @@
-﻿using Unmanaged;
+﻿using System;
+using Unmanaged;
 
 namespace Fonts.Components
 {
@@ -6,7 +7,7 @@ namespace Fonts.Components
     {
         public readonly ASCIIText256 familyName;
 
-        public FontName(USpan<char> familyName)
+        public FontName(Span<char> familyName)
         {
             this.familyName = new(familyName);
         }
