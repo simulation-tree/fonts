@@ -48,7 +48,7 @@ namespace Fonts
         public unsafe readonly override string ToString()
         {
             char character = Character;
-            System.Span<char> buffer = ['\'', character, '\''];
+            Span<char> buffer = ['\'', character, '\''];
             return buffer.ToString();
         }
 
