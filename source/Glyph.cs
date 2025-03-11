@@ -92,8 +92,7 @@ namespace Fonts
                 }
             }
 
-            kernings.Length++;
-            kernings[count] = new(nextCharacter, amount);
+            kernings.Add(new(nextCharacter, amount));
         }
 
         public readonly void ClearKernings()
