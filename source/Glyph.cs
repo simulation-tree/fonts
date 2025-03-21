@@ -30,7 +30,7 @@ namespace Fonts
         /// </summary>
         public readonly (int x, int y) Size => GetComponent<IsGlyph>().size;
 
-        public readonly ReadOnlySpan<Kerning> Kernings => GetArray<Kerning>().AsSpan();
+        public readonly ReadOnlySpan<Kerning> Kernings => GetArray<Kerning>();
 
         public Glyph(World world, char character, (int x, int y) advance, (int x, int y) bearing, (int x, int y) offset, (int x, int y) size, ReadOnlySpan<Kerning> kernings)
         {
