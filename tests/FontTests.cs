@@ -8,7 +8,7 @@ namespace Fonts.Tests
     {
         static FontTests()
         {
-            TypeRegistry.Load<FontsTypeBank>();
+            MetadataRegistry.Load<FontsTypeBank>();
         }
 
         protected override Schema CreateSchema()
