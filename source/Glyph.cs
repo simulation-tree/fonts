@@ -95,10 +95,13 @@ namespace Fonts
             kernings.Add(new(nextCharacter, amount));
         }
 
+        /// <summary>
+        /// Clears all kernings from this glyph.
+        /// </summary>
         public readonly void ClearKernings()
         {
             Values<Kerning> kernings = GetArray<Kerning>();
-            kernings.Length = 0;
+            kernings.Clear();
         }
     }
 }
