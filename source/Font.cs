@@ -64,7 +64,7 @@ namespace Fonts
         /// <summary>
         /// Creates a request for a font from the given <paramref name="address"/>.
         /// </summary>
-        public Font(World world, ASCIIText256 address, uint pixelSize = DefaultPixelSize, TimeSpan timeout = default)
+        public Font(World world, ASCIIText256 address, uint pixelSize = DefaultPixelSize, double timeout = default)
         {
             this.world = world;
             value = world.CreateEntity(new IsFontRequest(pixelSize, address, timeout));

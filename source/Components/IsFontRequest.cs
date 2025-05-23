@@ -1,5 +1,4 @@
-﻿using System;
-using Unmanaged;
+﻿using Unmanaged;
 
 namespace Fonts.Components
 {
@@ -7,16 +6,16 @@ namespace Fonts.Components
     {
         public uint pixelSize;
         public ASCIIText256 address;
-        public TimeSpan timeout;
-        public TimeSpan duration;
+        public double timeout;
+        public double duration;
         public Status status;
 
-        public IsFontRequest(uint pixelSize, ASCIIText256 address, TimeSpan timeout)
+        public IsFontRequest(uint pixelSize, ASCIIText256 address, double timeout)
         {
             this.pixelSize = pixelSize;
             this.address = address;
             this.timeout = timeout;
-            this.duration = TimeSpan.Zero;
+            this.duration = 0;
             this.status = Status.Submitted;
         }
 
