@@ -19,13 +19,6 @@ namespace Fonts.Components
             this.status = Status.Submitted;
         }
 
-        public readonly IsFontRequest BecomeLoaded()
-        {
-            IsFontRequest request = this;
-            request.status = Status.Loaded;
-            return request;
-        }
-
         public enum Status : byte
         {
             Submitted,
