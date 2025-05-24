@@ -1,6 +1,5 @@
 ﻿using Fonts.Components;
 using System;
-using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Unmanaged;
@@ -150,10 +149,13 @@ namespace Fonts
 
         public readonly (Vector2 maxPosition, int vertexCount) GenerateVertices(ReadOnlySpan<char> text, Span<Vector3> vertices)
         {
-            uint lineHeight = LineHeight;
-            Vector2 cursor = default;
-            uint pixelSize = GetComponent<IsFontRequest>().pixelSize;
             Values<FontGlyph> glyphs = GetArray<FontGlyph>();
+            return GenerateVertices(world, value, text, vertices, LineHeight, PixelSize, glyphs);
+        }
+
+        public static (Vector2 maxPosition, int vertexCount) GenerateVertices(World world, uint font, ReadOnlySpan<char> text, Span<Vector3> vertices, uint lineHeight, uint pixelSize, ReadOnlySpan<FontGlyph> glyphs)
+        {
+            Vector2 cursor = default;
             int vertexIndex = 0;
             for (int i = 0; i < text.Length; i++)
             {
@@ -184,10 +186,9 @@ namespace Fonts
                 else
                 {
                     glyphReference = glyphs['?'].value;
-                    Trace.WriteLine($"Character `{c}` (`{(uint)c}`) is missing from font `{FamilyName}`");
                 }
 
-                uint glyphEntity = GetReference(glyphReference);
+                uint glyphEntity = world.GetReference(font, glyphReference);
                 IsGlyph glyph = world.GetComponent<IsGlyph>(glyphEntity);
                 Vector2 size = glyph.Size;
                 Vector2 origin = GetGlyphOrigin(cursor, glyph);
