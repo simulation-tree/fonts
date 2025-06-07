@@ -30,9 +30,9 @@
 
   <ItemGroup>
     <Content Include="bin/Debug/net9.0/Fonts.dll" Pack="true" PackagePath="tools/debug/Fonts.dll" Visible="false"/>
-    <Content Include="bin/Debug/net9.0/Fonts.xml" Pack="true" PackagePath="tools/debug/Fonts.xml" Visible="false"/>
+    <Content Include="bin/Debug/net9.0/Fonts.xml" Pack="true" PackagePath="tools/debug/Fonts.xml" Visible="false" Condition="Exists('bin/Debug/net9.0/Fonts.xml')"/>
     <Content Include="bin/Release/net9.0/Fonts.dll" Pack="true" PackagePath="tools/release/Fonts.dll" Visible="false"/>
-    <Content Include="bin/Release/net9.0/Fonts.xml" Pack="true" PackagePath="tools/release/Fonts.xml" Visible="false"/>
+    <Content Include="bin/Release/net9.0/Fonts.xml" Pack="true" PackagePath="tools/release/Fonts.xml" Visible="false" Condition="Exists('bin/Release/net9.0/Fonts.xml')"/>
     <Content Include="build/Fonts.targets" Pack="true" PackagePath="build/Fonts.targets" Visible="false"/>
   </ItemGroup>
 
