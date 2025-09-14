@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <PackageId>SimulationTree.Fonts.Tests</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
